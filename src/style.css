@@ -5,17 +5,25 @@
 }
 
 /* Sample text group */
-span {
+.word {
   font-family: "Open Sans", sans-serif;
   font-size: 30px;
   margin-bottom: 10px;
-  width: 999px;
-  text-align: justify;
+  display: flex;
+  flex-direction: row;
+  margin-right: 20px;
+}
 
+.text-container {
+  width: 999px;
+  display: flex;
+  flex-direction: row;
+  overflow: hidden;
+  text-align: justify;
   line-height: 40px;
   max-height: 80px;
-  overflow: hidden;
-  display: inline-block;
+  flex-wrap: wrap; /* add this line */
+  margin-bottom: 30px;
 }
 
 

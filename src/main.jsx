@@ -15,10 +15,10 @@ function App() {
             .then(response => response.json())
             .then(data => {
                 setText(data.join(' '));
-                apiCalledRef.current = true;
                 setIsLoading(false);
                 console.log(data);
             });
+          apiCalledRef.current = true;
         }
     }, []);
 
@@ -28,13 +28,10 @@ function App() {
         );
     } else {
       return (
-        <div>
           <div className="main-container">
-            <span>{text}</span>
-            <TextField givenWords={text}/>
-            <Keyboard />
-          </div>    
-        </div>
+          <TextField givenWords={text}/>
+          <Keyboard />
+        </div>    
       );
     }
 }
