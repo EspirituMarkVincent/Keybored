@@ -22,7 +22,7 @@
   text-align: justify;
   line-height: 40px;
   max-height: 80px;
-  flex-wrap: wrap; /* add this line */
+  flex-wrap: wrap;
   margin-bottom: 30px;
 }
 

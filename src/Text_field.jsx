@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { use } from 'react';
 import './style.css';
 import { useState, useEffect, useRef } from 'react';
 
@@ -38,16 +38,49 @@ function TextField({ givenWords }) {
 
 function GetInput({ givenWords, letterRefs }) {
     const [input, setInput] = useState('');
-    const [words, setWords] = useState(givenWords.split(' '));
+    // const [words, setWords] = useState(givenWords.split(''));
     const [charIndex, setCharIndex] = useState(0);
     const [wordIndex, setWordIndex] = useState(0);
+    const [isWrong, setIsWrong] = useState(false);
+    const [isSpacePressed, setIsSpacePressed] = useState(false);
+
     const handleChange = (e) => {
-        setInput(e.target.value);
-        setCharIndex(charIndex + 1);
-        console.log(letterRefs.current[wordIndex][charIndex]);
+        
+        if (e.target.value.slice(-1) === ' ') {
+            setIsSpacePressed(true);
+            console.log("space");
+            setInput('');
+            setWordIndex(wordIndex + 1);
+            setCharIndex(0);
+        }
+
+        try {
+        if (!isSpacePressed) {
+            if (e.target.value.slice(-1) === letterRefs.current[wordIndex][charIndex].textContent) {
+                setInput(e.target.value);
+                letterRefs.current[wordIndex][charIndex].style.color = 'green';
+                console.log("You typed the correct text!");
+                setCharIndex(charIndex + 1);
+                if (isWrong) {
+                    letterRefs.current[wordIndex][charIndex].style.color = 'red';
+                    setIsWrong(false);
+                }
+            } else {
+                letterRefs.current[wordIndex][charIndex].style.color = 'red';
+                setIsWrong(true);
+            }
+        }
+        } catch (error) {
+            console.log("space");
+        }
+
+        setIsSpacePressed(false);
+
+        console.log("input: " + e.target.value.slice(-1) + 
+            ", wordIndex: " + wordIndex + 
+            ", charIndex: " + charIndex);            
     };
-    
- 
+
     return (
         <input
             id="input-field"

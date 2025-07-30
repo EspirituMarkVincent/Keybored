@@ -11,7 +11,7 @@ function App() {
 
     useEffect(() => {
         if (!apiCalledRef.current) {
-            fetch('https://random-word-api.herokuapp.com/word?number=100')
+            fetch('https://random-word-api.vercel.app/api?words=10')
             .then(response => response.json())
             .then(data => {
                 setText(data.join(' '));
