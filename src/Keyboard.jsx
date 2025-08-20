@@ -2,16 +2,18 @@ import { useEffect, useState } from "react";
 import { rows, setKeySize } from "./Keys";
 import './style.css';
 
-export default function Keyboard() {
+export default function Keyboard({ isFocused }) {
     const [pressedKey, setPressedKey] = useState({});
 
     useEffect(() => {
         const handleKeyDown = (e) => {
+            if (!isFocused) return;
             const key = e.key;
             setPressedKey((prev) => ({ ...prev, [key]: true }));
         };
 
         const handleKeyUp = (e) => {
+            if (!isFocused) return;
             const key = e.key;
             setPressedKey((prev) => ({ ...prev, [key]: false }));
         };
@@ -22,9 +24,10 @@ export default function Keyboard() {
             window.removeEventListener("keydown", handleKeyDown);
             window.removeEventListener("keyup", handleKeyUp);
         };
-    }, []);
+    }, [isFocused]);
 
     const isKeyPressed = (key) => {
+        if (!isFocused) return false;
         const keys = key.key;
         if (Array.isArray(keys)) {
             return keys.some((k) => pressedKey[k]);

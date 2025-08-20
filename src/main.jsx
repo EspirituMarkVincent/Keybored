@@ -2,8 +2,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
 import Keyboard from './Keyboard';
-import { TextField } from './Text_field';
-import GetInput from './Get_input';
+import TextField from './Text_field';
+import { GetInput } from './Get_input';
 import { localText } from './No_word_api';
 
 function App() {
@@ -14,16 +14,17 @@ function App() {
 
     const [text, setText] = useState('');
     const [loading, setLoading] = useState(true);
+    const [isFocused, setIsFocused] = useState(false);
 
     useEffect(() => {
         setLoading(true);
-        fetch('https://random-word-api.vercel.app/api?words=100')
+        fetch('1https://random-word-api.vercel.app/api?words=100')
         .then(r => r.json())
         .then(data => setText(data.join(' ')))
         .catch(() => setText(localText.join(' ')))
         .finally(() => setLoading(false));
     }, []);
-
+  
     if (loading) return <div>Loading...</div>;
 
     return (
@@ -41,8 +42,9 @@ function App() {
             wordRefs={wordRefs}
             wpmRefs={wpmRefs}
             timeRefs={timeRefs}
+            onFocusChange={setIsFocused}
         />
-        <Keyboard />
+        <Keyboard isFocused={isFocused} />
     </div>
   );
 }

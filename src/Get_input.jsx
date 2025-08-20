@@ -1,7 +1,8 @@
 import './style.css';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, use } from 'react';
+import { HidePrevLine } from './Text_field';
 
-function GetInput({ givenWords, letterRefs, wordRefs, wpmRefs, timeRefs }) {
+function GetInput({ givenWords, letterRefs, wordRefs, wpmRefs, timeRefs, onFocusChange }) {
     const [input, setInput] = useState('');
     const [wordIndex, setWordIndex] = useState(0);
     const [cursorPos, setCursorPos] = useState(0);
@@ -20,23 +21,12 @@ function GetInput({ givenWords, letterRefs, wordRefs, wpmRefs, timeRefs }) {
     const [timeLeft, setTimeLeft] = useState(time);
     const timerRef = useRef(null);
 
-    // Highlight active line
-    useEffect(() => {
-        Object.values(wordRefs.current).forEach(wordElement => {
-            if (wordElement?.classList.contains(`line-${currentLine}`)) {
-                wordElement.classList.add('active');
-            } else {
-                wordElement.classList.remove('active');
-            }
-        });
-    }, [cursorPos, currentLine, wordRefs]);
-
     const handleKeyDown = (e) => {
         if (e.key === ' ' && input !== '') {
             e.preventDefault();
             setWordIndex((prev) => prev + 1);
             setCursorPos(0);
-            setInput('');
+            setInput('');   
         }
     };
 
@@ -57,74 +47,28 @@ function GetInput({ givenWords, letterRefs, wordRefs, wpmRefs, timeRefs }) {
     };
 
     useEffect(() => {
+        return () => clearInterval(timerRef.current);
+    }, []);
+
+    // Compute Score Data
+    useEffect(() => {
         if (!timeRefs?.current) return;
 
         timeRefs.current.textContent = `${timeLeft}s`;
         const elapsedTime = time - timeLeft;
+        wpmRefs.current.textContent = `${((wordScore / elapsedTime) * 60).toFixed(2)} WPM`;
+        
+
         const currentWord = givenWords.split(' ')[wordIndex] || '';
         console.log(`Time Left: ${timeLeft}s | Elapsed: ${elapsedTime}s | Current Word: "${currentWord}" | Word Score: ${wordScore}/${totalCurrentWords} | Letter Score: ${letterScore}/${totalCurrentLetters}`);
 
         if (timeLeft === 0) {
             console.log("Time’s up!");
+            onFocusChange(false);
         }
-    }, [timeLeft, time, wordIndex, givenWords, timeRefs]);
+    }, [timeLeft]);
 
-    useEffect(() => {
-        return () => clearInterval(timerRef.current);
-    }, []);
-
-    // Track cursor position
-    useEffect(() => {
-        const handleSelectionChange = () => {
-            if (document.activeElement === inputRef.current) {
-                setCursorPos(inputRef.current.selectionStart);
-            }
-        };
-        document.addEventListener('selectionchange', handleSelectionChange);
-        return () =>
-            document.removeEventListener('selectionchange', handleSelectionChange);
-    }, []);
-
-    // Highlight current letter
-    useEffect(() => {
-        const letters = letterRefs.current[wordIndex];
-        if (!letters) return;
-
-        if (givenWords.split(' ')[wordIndex]?.length >= input.length) {
-            Object.values(letterRefs.current).forEach((word) => {
-                Object.values(word).forEach((letter) =>
-                    letter.classList.remove('highlight')
-                );
-            });
-            if (letters[cursorPos]) {
-                letters[cursorPos].classList.add('highlight');
-            }
-
-            letterCorrectness();
-        }
-    }, [cursorPos, wordIndex, input, letterRefs, givenWords]);
-
-    function letterCorrectness() {
-        const currentGivenWord = letterRefs.current[wordIndex];
-        if (!currentGivenWord) return;
-        const givenWordLength = Object.keys(currentGivenWord).length;
-
-        for (let i = 0; i < input.length; i++) {
-            if (input[i] === currentGivenWord[i].textContent) {
-                currentGivenWord[i].classList.add('correct');
-                currentGivenWord[i].classList.remove('incorrect');
-            } else {
-                currentGivenWord[i].classList.add('incorrect');
-                currentGivenWord[i].classList.remove('correct');
-            }
-        }
-
-        for (let i = input.length; i < givenWordLength; i++) {
-            currentGivenWord[i].classList.remove('correct', 'incorrect');
-        }
-    }
-
-    // Scoring
+    // Get Score Data
     useEffect(() => {
         if (wordIndex === 0) return;
 
@@ -154,7 +98,60 @@ function GetInput({ givenWords, letterRefs, wordRefs, wpmRefs, timeRefs }) {
         setLetterScore((prev) => prev + correctLetters);
         setTotalCurrentWords((prev) => prev + 1);
         if (correctWord) setWordScore((prev) => prev + 1);
+        
     }, [wordIndex, isStarted, givenWords, letterRefs]);
+
+    // Track cursor position
+    useEffect(() => {
+        const handleSelectionChange = () => {
+            if (document.activeElement === inputRef.current) {
+                setCursorPos(inputRef.current.selectionStart);
+            }
+        };
+        document.addEventListener('selectionchange', handleSelectionChange);
+        return () =>
+            document.removeEventListener('selectionchange', handleSelectionChange);
+    }, []);
+
+    // Run on Cursor Changes, Highlight current letter
+    useEffect(() => {
+        const letters = letterRefs.current[wordIndex];
+        if (!letters) return;
+
+        if (givenWords.split(' ')[wordIndex]?.length >= input.length) {
+            Object.values(letterRefs.current).forEach((word) => {
+                Object.values(word).forEach((letter) =>
+                    letter.classList.remove('highlight')
+                );
+            });
+            if (letters[cursorPos]) {
+                letters[cursorPos].classList.add('highlight');
+            }
+            checkLetterCorrectness();
+        }
+
+    HidePrevLine();
+    }, [cursorPos]);
+
+    function checkLetterCorrectness() {
+        const currentGivenWord = letterRefs.current[wordIndex];
+        if (!currentGivenWord) return;
+        const givenWordLength = Object.keys(currentGivenWord).length;
+
+        for (let i = 0; i < input.length; i++) {
+            if (input[i] === currentGivenWord[i].textContent) {
+                currentGivenWord[i].classList.add('correct');
+                currentGivenWord[i].classList.remove('incorrect');
+            } else {
+                currentGivenWord[i].classList.add('incorrect');
+                currentGivenWord[i].classList.remove('correct');
+            }
+        }
+
+        for (let i = input.length; i < givenWordLength; i++) {
+            currentGivenWord[i].classList.remove('correct', 'incorrect');
+        }
+    }
 
     return (
         <div className="form-group">
@@ -166,6 +163,8 @@ function GetInput({ givenWords, letterRefs, wordRefs, wpmRefs, timeRefs }) {
                 onChange={handleInputChange}
                 onKeyDown={handleKeyDown}
                 disabled={timeLeft === 0}
+                onFocus={() => onFocusChange(true)}
+                onBlur={() => onFocusChange(false)}
             />
 
             <div className="stat-box wpm" ref={wpmRefs}> WPM </div>
@@ -175,4 +174,4 @@ function GetInput({ givenWords, letterRefs, wordRefs, wpmRefs, timeRefs }) {
     );
 }
 
-export default GetInput;
+export { GetInput };
