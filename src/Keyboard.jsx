@@ -20,10 +20,18 @@ export default function Keyboard({ isFocused }) {
 
         window.addEventListener("keydown", handleKeyDown);
         window.addEventListener("keyup", handleKeyUp);
+
         return () => {
             window.removeEventListener("keydown", handleKeyDown);
             window.removeEventListener("keyup", handleKeyUp);
         };
+    }, [isFocused]);
+
+    // Reset pressedKey when not focus
+    useEffect(() => {
+        if (!isFocused) {
+            setPressedKey({});
+        }
     }, [isFocused]);
 
     const isKeyPressed = (key) => {

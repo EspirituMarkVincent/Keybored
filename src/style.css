@@ -1,119 +1,126 @@
 .main-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;  
+    display: flex;
+    flex-direction: column;
+    align-items: center;  
+}
+
+.game-mode {
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 30px;
 }
 
 /* Sample text group */
 .word {
-  font-family: "Open Sans", sans-serif;
-  font-size: 30px;
-  font-family: monospace;
-  margin-bottom: 10px;
-  display: flex;
-  flex-direction: row;
+    font-family: "Open Sans", sans-serif;
+    font-size: 30px;
+    font-family: monospace;
+    margin-bottom: 10px;
+    display: flex;
+    flex-direction: row;
 }
 
 .letter.highlight {
-  background-color: gray;
-  border-radius: 4px;
-  transition: background-color 0.2s ease;
+    background-color: gray;
+    border-radius: 4px;
+    transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
 .letter.incorrect {
-  color: red;
-  border-radius: 4px;
-  transition: background-color 0.2s ease;
+    color: red;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
 }
 
 .letter.correct {
-  color: green;
-  border-radius: 4px;
-  transition: background-color 0.2s ease;
+    color: green;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
 }
 
 .text-container {
-  display: flex;
-  flex-direction: row;
-  overflow: hidden;
-  text-align: justify;
-  line-height: 40px;
-  flex-wrap: wrap;
-  pointer-events: none;
-  user-select: none;
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    overflow: hidden;
+    text-align: justify;
+    line-height: 40px;
+    flex-wrap: wrap;
+    pointer-events: none;
+    user-select: none;
 }
 
 .text-wrapper {
 	margin-bottom: 30px;	
 	width: 65%;
 	height: 150px;
-	overflow: hidden; /* hides anything beyond the height */
+	overflow: hidden;
 }
 
 .word.lineDone {
-  display: none;
+    display: none;
 }
 
 /* Input group */
 .form-group {
-  height: 60px;
-  font-size: 30px;
-  display: flex;
-  flex-direction: row;
-  padding: 0%;
+    height: 60px;
+    font-size: 30px;
+    display: flex;
+    flex-direction: row;
+    padding: 0%;
 }
 
 .input-field {
-  width: 518px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  padding: 10px;
-  font-size: 24px;
-  margin-right: 5px;
-  text-align: center;
+    width: 518px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    padding: 10px;
+    font-size: 24px;
+    margin-right: 5px;
+    text-align: center;
 }
 
 .stat-box {
-  margin-left: 5px;
-  margin-right: 5px;
-  height: 100%;
-  width: 140px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: #f0f0f0;
-  border-radius: 8px;
-  font-family: "Open Sans", sans-serif;
+    margin-left: 5px;
+    margin-right: 5px;
+    height: 100%;
+    width: 140px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f0f0f0;
+    border-radius: 8px;
+    font-family: "Open Sans", sans-serif;
 }
 
 
 /* Keyboard div */
 .grid-board {
-  display: grid;
-  margin-top: 15px;
-  justify-content: center;
+    display: grid;
+    margin-top: 15px;
+    justify-content: center;
 }
 
 .grid-row {
-  display: flex;
-  justify-content: space-between;
+    display: flex;
+    justify-content: space-between;
 }
 
 .grid-key {
-  background: #eee;
-  padding: 0;
-  border-radius: 8px;
-  width: calc(650px / 14);
-  height: 60px;
-  font-size: 16px;
-  border: 1px solid #ccc;
-  margin: 2px;
-  align-items: center;
-  justify-content: center;
-  outline: none;
+    background: #eee;
+    padding: 0;
+    border-radius: 8px;
+    width: calc(650px / 14);
+    height: 60px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    margin: 2px;
+    align-items: center;
+    justify-content: center;
+    outline: none;
 }
 
 .grid-key.pressed {
-  background-color: #ccc;
-  border-color: #aaa;
+    background-color: #ccc;
+    border-color: #aaa;
 }

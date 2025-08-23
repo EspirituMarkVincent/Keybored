@@ -86,6 +86,7 @@ export default function TextField({ text, letterRefs, wordRefs, wpmRefs, timeRef
                         </div>
                     </div>
                 ))}
+                <div className='cursor'></div>
             </div>
         </div>
         
