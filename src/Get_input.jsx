@@ -1,245 +1,279 @@
-    import './style.css';
-    import { useState, useEffect, useRef, use } from 'react';
-    import { HidePrevLine } from './Text_field';
+import "./style.css";
+import { useState, useEffect, useRef } from "react";
+import { hidePrevLine } from "./Text_field";
 
-    function GetInput({ givenWords, letterRefs, wordRefs, wpmRefs, timeRefs, onFocusChange, gameMode, timeGoalSelected, wordGoalSelected }) {
-        const [input, setInput] = useState('');
-        const [wordIndex, setWordIndex] = useState(0);
-        const [cursorPos, setCursorPos] = useState(0);
-        const inputRef = useRef(null);
-        const [currentLine, setCurrentLine] = useState(1);
+function GetInput({
+    givenWords,
+    letterRefs,
+    wordRefs,
+    wpmRefs,
+    timeRefs,
+    onFocusChange,
+    gameModeSettings,
+    isFinished,
+    setIsFinished,
+    score,
+    setScore,
+}) {
+    const { mode, timeGoal, wordGoal } = gameModeSettings;
 
-        // Scoring
-        const [letterScore, setLetterScore] = useState(0);
-        const [totalCurrentLetters, setTotalCurrentLetters] = useState(0);
-        const [wordScore, setWordScore] = useState(0);
-        const [totalCurrentWords, setTotalCurrentWords] = useState(0);
+    const [input, setInput] = useState("");
+    const [wordIndex, setWordIndex] = useState(0);
+    const [cursorPos, setCursorPos] = useState(0);
+    const inputRef = useRef(null);
 
-        // Timer
-        const [isStarted, setIsStarted] = useState(false);
-        const [timer, setTimer] = useState(timeGoalSelected);
-        const timerRef = useRef(null);
-        const [isFinished, setIsFinished] = useState(false);
+    // Timer
+    const [isStarted, setIsStarted] = useState(false);
+    const [timer, setTimer] = useState(timeGoal);
+    const timerRef = useRef(null);
 
-        // When spacebar is clicked, move to next word
-        const handleKeyDown = (e) => {
-            if (e.key === ' ' && input !== '') {
-                e.preventDefault();
-                setWordIndex((prev) => prev + 1);
-                setCursorPos(0);
-                setInput('');   
-            }
-        };
+    // local WPM + acc
+    const [wordWPM, setWordWPM] = useState(0);
+    const [standardWPM, setStandardWPM] = useState(0);
+    const [accuracy, setAccuracy] = useState(0);
 
-        // Start time on first input
-        const handleInputChange = (e) => {
-            if (!isStarted) {
-                setIsStarted(true);
-                timerRef.current = setInterval(() => {
-                    setTimer((prev) => {
-                        if (prev <= 1) {
-                            clearInterval(timerRef.current);
-                            return 0;
-                        }
-                        
-                        if (gameMode === 'time') return prev - 1;
-                        if (gameMode === 'words') return prev + 1;
-                    });
-                }, 1000);
-            }
-            setInput(e.target.value);
-        };
-
-        useEffect(() => {
-            return () => clearInterval(timerRef.current);
-        }, []);
-
-        //Reset Stats on gamemode change
-        useEffect(() => {
-            resetStats();
-            console.log(`Game Mode: ${gameMode}`);
-        }, [gameMode]);
-
-        // Compute Score Data
-        useEffect(() => {
-            if (!timeRefs?.current) return;
-
-            const elapsedTime = timeGoalSelected - timer;
-
-            switch (gameMode) {
-                // by time mode
-                case 'time':
-                    timeRefs.current.textContent = `${timer}s`;
-                    console.log(`Time Left: ${timer}s | Elapsed: ${elapsedTime}s | Word Score: ${wordScore}/${totalCurrentWords} | Letter Score: ${letterScore}/${totalCurrentLetters}`);
-                    if (timer === 0) {
-                        console.log("Time’s up!");
-                        onFocusChange(false);
-                        setIsFinished(true);
-                        break;
-                    }
-                    break;
-                // by words mode
-                case 'words':
-                    timeRefs.current.textContent = `${wordIndex}/${wordGoalSelected}`;
-                    console.log(`Time Left: ${timer}s | Elapsed: ${elapsedTime}s | Word Score: ${wordScore}/${totalCurrentWords} | Letter Score: ${letterScore}/${totalCurrentLetters}`);
-                    if (wordIndex === wordGoalSelected) {
-                        console.log("Words limit reached!");
-                        onFocusChange(false);
-                        setIsFinished(true);
-                        break;
-                    }
-                    break;
-            }
-
-            wpmRefs.current.textContent = `${((wordScore / elapsedTime) * 60).toFixed(2)} WPM`;
-        }, [input, timer, wordIndex]);
-
-        // Get Score Data
-        useEffect(() => {
-            if (wordIndex === 0) return;
-
-            const prevWordIndex = wordIndex - 1;
-            const prevWord = givenWords.split(' ')[prevWordIndex];
-            let lettersScored = 0;
-            let correctLetters = 0;
-            let correctWord = true;
-
-            for (let i = 0; i < prevWord.length; i++) {
-                const letter = letterRefs.current[prevWordIndex]?.[i];
-                if (!letter) continue;
-
-                lettersScored++;
-
-                if (letter.classList.contains('correct')) {
-                    correctLetters++;
-                } else if (!letter.classList.contains('incorrect')) {
-                    letter.classList.add('incorrect');
-                    correctWord = false;
-                } else {
-                    correctWord = false;
-                }
-            }
-
-            setTotalCurrentLetters((prev) => prev + lettersScored);
-            setLetterScore((prev) => prev + correctLetters);
-            setTotalCurrentWords((prev) => prev + 1);
-            if (correctWord) setWordScore((prev) => prev + 1);
-            
-        }, [wordIndex, isStarted, givenWords, letterRefs]);
-
-        // Track cursor position
-        useEffect(() => {
-            const handleSelectionChange = () => {
-                if (document.activeElement === inputRef.current) {
-                    setCursorPos(inputRef.current.selectionStart);
-                }
-            };
-            document.addEventListener('selectionchange', handleSelectionChange);
-
-            return () =>
-                document.removeEventListener('selectionchange', handleSelectionChange);
-        }, []);
-
-        // Highlight current letter
-        useEffect(() => {
-            const letters = letterRefs.current[wordIndex];
-            const cursor = document.querySelector('.cursor');
-
-            if (!letters) return;
-
-            if (givenWords.split(' ')[wordIndex]?.length >= input.length) {
-                Object.values(letterRefs.current).forEach((word) => {
-                Object.values(word).forEach((letter) =>
-                    letter.classList.remove('highlight')
-                );
-                });
-
-                if (letters[cursorPos]) {
-                    letters[cursorPos].classList.add('highlight');
-                } 
-            }
-
-            checkLetterCorrectness();
-            HidePrevLine();
-        }, [cursorPos, wordIndex]);
-
-
-        function checkLetterCorrectness() {
-            const currentGivenWord = letterRefs.current[wordIndex];
-            if (!currentGivenWord) return;
-            const givenWordLength = Object.keys(currentGivenWord).length;
-
-           for (let i = 0; i < givenWordLength; i++) {
-                const letterElem = currentGivenWord[i];
-                const typedLetter = input[i];
-
-                letterElem.classList.toggle('correct', typedLetter === letterElem.textContent);
-                letterElem.classList.toggle('incorrect', typedLetter != null && typedLetter !== letterElem.textContent);
-            }
-        }
-
-        function resetStats() {
-            setInput('');
-            setWordIndex(0);
+    // handle space (next word)
+    const handleKeyDown = (e) => {
+        if (e.key === " " && input !== "") {
+            e.preventDefault();
+            setWordIndex((prev) => prev + 1);
             setCursorPos(0);
-            setCurrentLine(1);
+            setInput("");
+        }
+    };
 
-            setLetterScore(0);
-            setTotalCurrentLetters(0);
-            setWordScore(0);
-            setTotalCurrentWords(0);
+    const handleInputChange = (e) => {
+        if (!isStarted) startTimer();
+        setInput(e.target.value);
+    };
 
-            setTimer(timeGoalSelected);
-            clearInterval(timerRef.current);
-            setIsStarted(false);
-            setIsFinished(false);
-
-            if (gameMode === 'time') {
-                setTimer(timeGoalSelected)
-                timeRefs.current.textContent = `${timer}s`;
-            };
-            if (gameMode === 'words') {
-                setTimer(0);
-                timeRefs.current.textContent = `${wordIndex}/${wordGoalSelected}`;
-            };
-            wpmRefs.current.textContent = `0 WPM`;
-
-            Object.values(letterRefs.current).forEach((word) => {
-                Object.values(word).forEach((letter) => {
-                    letter.classList.remove('correct', 'incorrect');
-                    if (cursorPos !== 0) {
-                        letter.classList.remove('highlight');
+    const startTimer = () => {
+        setIsStarted(true);
+        timerRef.current = setInterval(() => {
+            setTimer((prev) => {
+                if (mode === "time") {
+                    if (prev <= 1) {
+                        clearInterval(timerRef.current);
+                        return 0;
                     }
-                });
+                    return prev - 1;
+                }
+                if (mode === "words") return prev + 1; // elapsed
+                return prev;
             });
+        }, 1000);
+    };
+
+    // cleanup
+    useEffect(() => {
+        return () => clearInterval(timerRef.current);
+    }, []);
+
+    // reset when mode/goal changes
+    useEffect(() => {
+        resetStats();
+    }, [gameModeSettings]);
+
+    // update timer + stats
+    useEffect(() => {
+        if (!timeRefs?.current) return;
+
+        const elapsed = mode === "time" ? timeGoal - timer : timer;
+
+        if (isFinished) clearInterval(timerRef.current);
+
+        // time/progress display
+        if (mode === "time") {
+            timeRefs.current.textContent = `${timer}s`;
+            if (timer === 0) setIsFinished(true);
+        } else {
+            timeRefs.current.textContent = `${wordIndex}/${wordGoal}`;
+            if (wordIndex >= wordGoal) setIsFinished(true);
         }
 
-        return (
-            <div className="form-group">
-                <input
-                    className="input-field"
-                    type="text"
-                    value={input}
-                    ref={inputRef}
-                    onChange={handleInputChange}
-                    onKeyDown={handleKeyDown}
-                    disabled={isFinished}
-                    onFocus={() => onFocusChange(true)}
-                    onBlur={() => onFocusChange(false)}
-                />
+        // stats
+        let currentWordWPM = 0;
+        let currentStandardWPM = 0;
+        if (elapsed > 0) {
+            currentWordWPM = ((score.wordScore / elapsed) * 60).toFixed(2);
+            currentStandardWPM = (score.letterScore / 5 / (elapsed / 60)).toFixed(2);
+        }
 
-                <div className="stat-box wpm" ref={wpmRefs}> WPM </div>
-                <div className="stat-box time" ref={timeRefs}>Time </div>
-                <div
-                    className="stat-box reset-button"
-                    onClick={() => { 
-                        resetStats(); 
-                    }}
-                    >
-                        Reset
-                    </div>
-            </div>
+        setWordWPM(currentWordWPM);
+        setStandardWPM(currentStandardWPM);
+
+        const acc =
+            score.totalLetters > 0
+                ? ((score.letterScore / score.totalLetters) * 100).toFixed(2)
+                : 100;
+        setAccuracy(acc);
+
+        if (wpmRefs?.current) {
+            wpmRefs.current.textContent = `${Math.round(currentStandardWPM)} WPM`;
+        }
+
+        // debug
+        const debug =
+            mode === "time"
+                ? `[TIME-${timeGoal}] Left: ${timer}s | Elapsed: ${elapsed}s`
+                : `[WORDS-${wordGoal}] Words: ${wordIndex}/${wordGoal} | Elapsed: ${elapsed}s`;
+
+        console.log(
+            `${debug} | WordScore: ${score.wordScore}/${score.totalWords} | ` +
+                `LetterScore: ${score.letterScore}/${score.totalLetters} | ` +
+                `Word-WPM: ${currentWordWPM} | Std-WPM: ${currentStandardWPM} | Acc: ${acc}%`
         );
-    }
+    }, [input, timer, wordIndex, wordGoal, score, isFinished]);
 
-    export { GetInput };
+    // on finish
+    useEffect(() => {
+        if (!isFinished) return;
+        setInput("");
+        console.log("Finished");
+        onFocusChange(false);
+    }, [isFinished]);
+
+    // score word
+    useEffect(() => {
+        if (wordIndex === 0) return;
+        scoreWord(wordIndex - 1);
+    }, [wordIndex]);
+
+    // cursor tracking
+    useEffect(() => {
+        const handleSelectionChange = () => {
+            if (document.activeElement === inputRef.current) {
+                setCursorPos(inputRef.current.selectionStart);
+            }
+        };
+        document.addEventListener("selectionchange", handleSelectionChange);
+        return () => document.removeEventListener("selectionchange", handleSelectionChange);
+    }, []);
+
+    const prevCursor = useRef(null);
+
+    useEffect(() => {
+        const letters = letterRefs.current[wordIndex];
+        if (!letters) return;
+
+        const wordLength = Object.keys(letters).length;
+        const safeIndex = Math.min(cursorPos, wordLength - 1);
+
+        if (prevCursor.current) {
+            prevCursor.current.classList.remove("highlight");
+        }
+
+        if (letters[safeIndex]) {
+            letters[safeIndex].classList.add("highlight");
+            prevCursor.current = letters[safeIndex];
+        }
+
+        checkLetterCorrectness();
+        hidePrevLine(wordRefs);
+    }, [cursorPos, wordIndex, letterRefs]);
+
+    const checkLetterCorrectness = () => {
+        const currentWord = letterRefs.current[wordIndex];
+        if (!currentWord) return;
+
+        Object.keys(currentWord).forEach((i) => {
+            const elem = currentWord[i];
+            const typed = input[i];
+            elem.classList.toggle("correct", typed === elem.textContent);
+            elem.classList.toggle("incorrect", typed != null && typed !== elem.textContent);
+        });
+    };
+
+    const scoreWord = (index) => {
+        const prevWord = givenWords.split(" ")[index];
+        const letters = letterRefs.current[index] || {};
+        let lettersScored = 0;
+        let correctLetters = 0;
+        let correctWord = true;
+
+        for (let i = 0; i < prevWord.length; i++) {
+            const letter = letters[i];
+            if (!letter) continue;
+
+            lettersScored++;
+            if (letter.classList.contains("correct")) {
+                correctLetters++;
+            } else {
+                letter.classList.add("incorrect");
+                correctWord = false;
+            }
+        }
+
+        setScore((prev) => {
+            return {
+                ...prev,
+                totalLetters: prev.totalLetters + lettersScored,
+                letterScore: prev.letterScore + correctLetters,
+                totalWords: prev.totalWords + 1,
+                wordScore: correctWord ? prev.wordScore + 1 : prev.wordScore,
+            };
+        });
+    };
+
+    const resetStats = () => {
+        clearInterval(timerRef.current);
+        setInput("");
+        setWordIndex(0);
+        setCursorPos(0);
+
+        setWordWPM(0);
+        setStandardWPM(0);
+        setAccuracy(0);
+
+        setIsStarted(false);
+        setIsFinished(false);
+
+        setScore({
+            totalLetters: 0,
+            letterScore: 0,
+            totalWords: 0,
+            wordScore: 0,
+        });
+
+        if (mode === "time") {
+            setTimer(timeGoal);
+            timeRefs.current.textContent = `${timeGoal}s`;
+        } else {
+            setTimer(0);
+            timeRefs.current.textContent = `0/${wordGoal}`;
+        }
+
+        if (wpmRefs?.current) wpmRefs.current.textContent = `0 WPM`;
+
+        Object.values(letterRefs.current).forEach((word) =>
+            Object.values(word).forEach((letter) => letter.classList.remove("correct", "incorrect"))
+        );
+    };
+
+    return (
+        <div className="form-group">
+            <input
+                className="input-field"
+                type="text"
+                value={input}
+                ref={inputRef}
+                onChange={handleInputChange}
+                onKeyDown={handleKeyDown}
+                disabled={isFinished}
+                onFocus={() => onFocusChange(true)}
+                onBlur={() => onFocusChange(false)}
+            />
+            <div className="stat-box wpm" ref={wpmRefs}>
+                WPM
+            </div>
+            <div className="stat-box time" ref={timeRefs}>
+                Time
+            </div>
+            <div className="stat-box reset-button" onClick={resetStats}>
+                Reset
+            </div>
+        </div>
+    );
+}
+
+export { GetInput };

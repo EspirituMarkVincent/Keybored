@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { rows, setKeySize } from "./Keys";
-import './style.css';
+import "./style.css";
 
 export default function Keyboard({ isFocused }) {
     const [pressedKey, setPressedKey] = useState({});
@@ -39,8 +39,8 @@ export default function Keyboard({ isFocused }) {
         const keys = key.key;
         if (Array.isArray(keys)) {
             return keys.some((k) => pressedKey[k]);
-        } else if (key.key === 'ShiftLeft' || key.key === 'ShiftRight') {
-            return pressedKey['Shift'];
+        } else if (key.key === "ShiftLeft" || key.key === "ShiftRight") {
+            return pressedKey["Shift"];
         } else {
             return pressedKey[keys];
         }

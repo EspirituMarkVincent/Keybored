@@ -1,13 +1,34 @@
+/* Themes */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+body {
+    font-family: "Poppins", sans-serif;
+}
+
 .main-container {
     display: flex;
     flex-direction: column;
-    align-items: center;  
+    align-items: center;
 }
 
-.game-mode {
+.gameResult {
+    margin: 10px;
+}
+
+.gameModeSelection {
     display: flex;
     flex-direction: row;
-    margin-bottom: 30px;
+}
+
+.gameMode {
+    margin: 0px;
+    border: none;
+    font-family: "Poppins", sans-serif;
+    font-weight: 400;
+}
+
+.gameMode:hover {
+    cursor: pointer;
+    background-color: #afafaf;
 }
 
 /* Sample text group */
@@ -18,24 +39,6 @@
     margin-bottom: 10px;
     display: flex;
     flex-direction: row;
-}
-
-.letter.highlight {
-    background-color: gray;
-    border-radius: 4px;
-    transition: background-color 0.3s ease, transform 0.3s ease;
-}
-
-.letter.incorrect {
-    color: red;
-    border-radius: 4px;
-    transition: background-color 0.2s ease;
-}
-
-.letter.correct {
-    color: green;
-    border-radius: 4px;
-    transition: background-color 0.2s ease;
 }
 
 .text-container {
@@ -51,33 +54,52 @@
 }
 
 .text-wrapper {
-	margin-bottom: 30px;	
-	width: 65%;
-	height: 150px;
-	overflow: hidden;
+    margin-bottom: 20px;
+    margin-top: 20px;
+    width: 80%;
+    height: 150px;
+    overflow: hidden;
 }
 
 .word.lineDone {
     display: none;
 }
 
+.letter.highlight {
+    background-color: gray;
+    border-radius: 4px;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.letter.incorrect {
+    color: red;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+}
+
+.letter.correct {
+    color: green;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+}
+
 /* Input group */
 .form-group {
     height: 60px;
-    font-size: 30px;
     display: flex;
     flex-direction: row;
     padding: 0%;
 }
 
 .input-field {
-    width: 518px;
+    width: 430px;
     border-radius: 8px;
     border: 1px solid #ccc;
     padding: 10px;
     font-size: 24px;
     margin-right: 5px;
     text-align: center;
+    font-family: monospace;
 }
 
 .stat-box {
@@ -90,15 +112,15 @@
     justify-content: center;
     background-color: #f0f0f0;
     border-radius: 8px;
-    font-family: "Open Sans", sans-serif;
+    font-size: 20px;
 }
-
 
 /* Keyboard div */
 .grid-board {
-    display: grid;
     margin-top: 15px;
     justify-content: center;
+    transform: scale(1);
+    transform-origin: top center;
 }
 
 .grid-row {
@@ -112,12 +134,14 @@
     border-radius: 8px;
     width: calc(650px / 14);
     height: 60px;
-    font-size: 16px;
+    font-size: 18px;
+    font-weight: 500;
     border: 1px solid #ccc;
     margin: 2px;
     align-items: center;
     justify-content: center;
     outline: none;
+    font-family: "Poppins", sans-serif;
 }
 
 .grid-key.pressed {
