@@ -42,11 +42,45 @@ function App() {
             .finally(() => setLoading(false));
     }
 
+    // NEW: Function to restart with new text
+    function restartText() {
+// Get new text
+        getText();
+
+        // Reset all refs
+        letterRefs.current = {};
+        wordRefs.current = {};
+        
+        // Reset state
+        setIsFinished(false);
+        setIsFocused(false);
+        
+        // Reset score
+        setScore({
+            wordScore: 0,
+            totalWords: 0,
+            letterScore: 0,
+            totalLetters: 0,
+            wordWPM: 0,
+            standardWPM: 0,
+            accuracy: 0,
+        });
+    }
+
     useEffect(() => {
         getText();
     }, []);
 
-    if (loading) return <div>Loading...</div>;
+    const firstRun = useRef(true);
+    useEffect(() => {
+        if (firstRun.current) {
+            firstRun.current = false; // skip the initial run
+            return;
+        }
+        restartText();
+    }, [gameModeSettings]);
+
+    //if (loading) return <div>Loading...</div>;
 
     return (
         <div className="main-container">
@@ -137,12 +171,20 @@ function App() {
                         </button>
                     </>
                 )}
+                
+                {/* NEW: New Text Button */}
+                <button
+                    className="gameMode newTextBtn"
+                    onClick={restartText}
+                >
+                    New Text
+                </button>
             </div>
 
             <TextField text={text} letterRefs={letterRefs} wordRefs={wordRefs} />
 
             <GetInput
-                givenWords={text}
+                text={text}
                 letterRefs={letterRefs}
                 wordRefs={wordRefs}
                 wpmRefs={wpmRefs}
@@ -158,10 +200,9 @@ function App() {
             {isFinished ? (
                 <>
                     <div className="gameResult">Game Result </div>
-                    <div className="gameResult">Score: {score}</div> 
                     <div className="gameResult">WPM: {score.standardWPM}</div>
-                    <div className="gameResult">Accuracy: {score.accuracy}%</div>
-                </>    
+                    <div className="gameResult">Accuracy: {score.accuracy}</div>
+                </>
             ) : (
                 <Keyboard isFocused={isFocused} />
             )}
