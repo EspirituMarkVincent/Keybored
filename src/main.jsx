@@ -22,7 +22,6 @@ function App() {
 
     const [isFinished, setIsFinished] = useState(false);
 
-    // Scoring
     const [score, setScore] = useState({
         wordScore: 0,
         totalWords: 0,
@@ -42,20 +41,12 @@ function App() {
             .finally(() => setLoading(false));
     }
 
-    // NEW: Function to restart with new text
     function restartText() {
-// Get new text
         getText();
 
-        // Reset all refs
-        letterRefs.current = {};
-        wordRefs.current = {};
-        
-        // Reset state
         setIsFinished(false);
         setIsFocused(false);
-        
-        // Reset score
+
         setScore({
             wordScore: 0,
             totalWords: 0,
@@ -74,13 +65,11 @@ function App() {
     const firstRun = useRef(true);
     useEffect(() => {
         if (firstRun.current) {
-            firstRun.current = false; // skip the initial run
+            firstRun.current = false;
             return;
         }
         restartText();
     }, [gameModeSettings]);
-
-    //if (loading) return <div>Loading...</div>;
 
     return (
         <div className="main-container">
@@ -171,12 +160,7 @@ function App() {
                         </button>
                     </>
                 )}
-                
-                {/* NEW: New Text Button */}
-                <button
-                    className="gameMode newTextBtn"
-                    onClick={restartText}
-                >
+                <button className="gameMode newTextBtn" onClick={restartText}>
                     New Text
                 </button>
             </div>

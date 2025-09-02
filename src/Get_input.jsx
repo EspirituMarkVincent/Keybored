@@ -1,4 +1,4 @@
-    import "./style.css";
+import "./style.css";
     import { useState, useEffect, useRef, use } from "react";
     import { hidePrevLine } from "./Text_field";
 
@@ -248,7 +248,7 @@
                 if (word) {
                     Object.values(word).forEach((letter) => {
                         if (letter && letter.classList) {
-                            letter.classList.remove("correct", "incorrect");
+                            letter.classList.remove("correct", "incorrect", "highlight");
                         }
                     });
                 }
