@@ -71,6 +71,12 @@ body {
     transition: background-color 0.2s ease, transform 0.2s ease;
 }
 
+.letter.excess {
+    color: rgb(255, 123, 123);
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+}
+
 .letter.incorrect {
     color: red;
     border-radius: 4px;
@@ -148,3 +154,12 @@ body {
     background-color: #ccc;
     border-color: #aaa;
 }
+
+/* .input-field {
+  width: 0;
+  height: 0;
+  opacity: 0;
+  border: none;
+  padding: 0;
+  margin: 0;
+} */

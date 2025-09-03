@@ -1,106 +1,115 @@
-import "./style.css";
-import { useRef, useEffect } from "react";
+import { useState, useRef, useEffect, memo } from "react";
 
-// Hide the previous line
-export function hidePrevLine(wordRefs) {
-    const words = Object.values(wordRefs.current).filter(Boolean);
+const MemoizedWord = memo(
+    ({ word, wordIndex, currentWordIndex, userInput, typedHistory, lineNumber, currentLineNumber }) => {
+        const isCurrent = wordIndex === currentWordIndex;
+        const pastWordUserInput = typedHistory[wordIndex];
+        const isTyped = pastWordUserInput !== undefined;
 
-    const wordElem = words.find((word) =>
-        Array.from(word.children).some((letter) => letter.classList.contains("highlight"))
-    );
+        const wordClasses = ["word"];
 
-    if (!wordElem) return;
+        const highlightSpace = isCurrent && userInput.length >= word.length;
 
-    const line = [...wordElem.classList].find((c) => c.startsWith("line-"));
-    const lineNum = line ? parseInt(line.replace("line-", ""), 10) : null;
+        return (
+            <span className={wordClasses.join(" ")}>
+                {word.split("").map((char, charIndex) => {
+                    let className = "letter ";
+                    
+                    if (isCurrent) {
+                        if (charIndex < userInput.length) {
+                            className += userInput[charIndex] === char ? "correct" : "incorrect";
+                        }
 
-    if (lineNum && lineNum > 1) {
-        const prevLineElems = words.filter((word) =>
-            word.classList.contains(`line-${lineNum - 2}`)
+                        if (charIndex === userInput.length) {
+                            className += "highlight ";
+                        }
+                    } else if (isTyped) {
+                        className += pastWordUserInput[charIndex] === char ? "correct" : "incorrect";
+                    }
+
+                    return (
+                        <span key={charIndex} className={className}>
+                            {char}
+                        </span>
+                    );
+                })}
+
+                {(() => {
+                    const typed = isCurrent ? userInput : pastWordUserInput || "";
+                    if (typed.length > word.length) {
+                        return typed.substring(word.length).split("").map((char, index) => (
+                            <span key={`excess-${index}`} className="letter excess">
+                                {char}
+                            </span>
+                        ));
+                    }
+                    return null;
+                })()}
+
+                <span className={`letter space ${highlightSpace ? "highlight" : ""}`}>&nbsp;</span>
+            </span>
         );
-        prevLineElems.forEach((el) => el.classList.add("lineDone"));
     }
-}
+);
 
-export default function TextField({ text, letterRefs, wordRefs }) {
+// This component now owns the logic for measuring and assigning line numbers.
+export default function TextField({ words, currentWordIndex, userInput, typedHistory }) {
+    const [lineAssignments, setLineAssignments] = useState({});
     const containerRef = useRef(null);
+    const wordRefs = useRef({});
 
     useEffect(() => {
         const updateLinePositions = () => {
-            const words = Object.values(wordRefs.current).filter(Boolean);
-            let currentLineTop = null;
+            const wordElements = Object.values(wordRefs.current).filter(Boolean);
+            if (wordElements.length === 0) return;
+
+            let currentLineTop = -1;
             let lineNumber = 0;
+            const newAssignments = {};
 
-            // Clear old line classes
-            words.forEach((wordElement) => {
-                wordElement.classList.forEach((className) => {
-                    if (className.startsWith("line-")) {
-                        wordElement.classList.remove(className);
-                    }
-                });
-            });
-
-            // Reassign line numbers
-            words.forEach((word) => {
-                if (currentLineTop === null || word.offsetTop !== currentLineTop) {
+            wordElements.forEach((wordEl, index) => {
+                if (wordEl.offsetTop > currentLineTop) {
                     lineNumber++;
-                    currentLineTop = word.offsetTop;
+                    currentLineTop = wordEl.offsetTop;
                 }
-                word.classList.add(`line-${lineNumber}`);
+                newAssignments[index] = lineNumber;
             });
-
-            hidePrevLine(wordRefs);
+            setLineAssignments(newAssignments);
         };
 
-        // Change line nums if size changes
         const observer = new ResizeObserver(updateLinePositions);
         if (containerRef.current) {
             observer.observe(containerRef.current);
         }
+
         updateLinePositions();
 
         return () => observer.disconnect();
-    }, [text, wordRefs]);
+    }, [words]);
+
+    const currentLineNumber = lineAssignments[currentWordIndex] || 1;
 
     return (
         <div className="text-wrapper">
             <div className="text-container" ref={containerRef}>
-                {text.split(" ").map((word, wordIndex) => (
-                    <div
-                        className="word"
-                        key={wordIndex}
-                        ref={(ref) => {
-                            wordRefs.current[wordIndex] = ref;
+                {words.map((word, wIndex) => (
+                    <span
+                        key={wIndex}
+                        ref={(el) => {
+                            wordRefs.current[wIndex] = el;
                         }}
                     >
-                        {word.split("").map((letter, letterIndex) => (
-                            <div
-                                className="letter"
-                                key={letterIndex}
-                                ref={(ref) => {
-                                    if (!letterRefs.current[wordIndex]) {
-                                        letterRefs.current[wordIndex] = {};
-                                    }
-                                    letterRefs.current[wordIndex][letterIndex] = ref;
-                                }}
-                            >
-                                {letter}
-                            </div>
-                        ))}
-                        <div
-                            className="letter"
-                            ref={(ref) => {
-                                if (!letterRefs.current[wordIndex]) {
-                                    letterRefs.current[wordIndex] = {};
-                                }
-                                letterRefs.current[wordIndex][word.length] = ref;
-                            }}
-                        >
-                            &nbsp;
-                        </div>
-                    </div>
+                        <MemoizedWord
+                            word={word}
+                            wordIndex={wIndex}
+                            currentWordIndex={currentWordIndex}
+                            userInput={userInput}
+                            typedHistory={typedHistory}
+                            lineNumber={lineAssignments[wIndex] || 0}
+                            currentLineNumber={currentLineNumber}
+                        />
+                    </span>
                 ))}
-                <div className="cursor"></div>
             </div>
         </div>
     );
