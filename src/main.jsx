@@ -256,8 +256,8 @@ function App() {
 
     return (
         <>
-            <div className="header">
-                <div className="header-title"> Key</div>
+            <div className="header-container">
+                <div className="header-title"> Keybored</div>
                 {/* <div className="header-divider"> </div> */}
                 <button
                     className="theme-toggle-btn header-btn"
@@ -433,11 +433,11 @@ function App() {
                 </div>
 
                 {isFinished ? (
-                    <>
-                        <div className="gameResult">Game Result</div>
-                        <div className="gameResult">WPM: {score.standardWPM}</div>
-                        <div className="gameResult">Accuracy: {score.accuracy}%</div>
-                    </>
+                    <div className="game-result-container">
+                        <div className="result">Game Result</div>
+                        <div className="result">WPM: {score.standardWPM}</div>
+                        <div className="result">Accuracy: {score.accuracy}%</div>
+                    </div>
                 ) : (
                     <Keyboard 
                         isUserTyping={isUserTyping} 
