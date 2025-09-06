@@ -1,22 +1,105 @@
 import { useEffect, useState } from "react";
-import "./style.css";
 
-export default function Keyboard({ isUserTyping }) {
+const keyData = {
+    Escape: { label: "Esc", size: "60px" },
+    Tab: { label: "Tab", size: "100px" },
+    Backspace: { label: "Backspace", size: "150px" },
+    CapsLock: { label: "Caps", size: "120px" },
+    Enter: { label: "Enter", size: "160px" },
+    ShiftLeft: { label: "Shift", size: "160px" },
+    ShiftRight: { label: "Shift", size: "180px" },
+    ControlLeft: { label: "Ctrl", size: "70px" },
+    ControlRight: { label: "Ctrl", size: "70px" },
+    AltLeft: { label: "Alt", size: "70px" },
+    AltRight: { label: "Alt", size: "70px" },
+    MetaLeft: { label: "Win", size: "70px" },
+    ContextMenu: { label: "Menu", size: "70px" },
+    Fn: { label: "Fn", size: "70px" },
+    " ": { label: "Space", size: "470px" },
+    q: { label: "Q", size: "60px", shifted: "Q" },
+    w: { label: "W", size: "60px", shifted: "W" },
+    e: { label: "E", size: "60px", shifted: "E" },
+    r: { label: "R", size: "60px", shifted: "R" },
+    t: { label: "T", size: "60px", shifted: "T" },
+    y: { label: "Y", size: "60px", shifted: "Y" },
+    u: { label: "U", size: "60px", shifted: "U" },
+    i: { label: "I", size: "60px", shifted: "I" },
+    o: { label: "O", size: "60px", shifted: "O" },
+    p: { label: "P", size: "60px", shifted: "P" },
+    a: { label: "A", size: "60px", shifted: "A" },
+    s: { label: "S", size: "60px", shifted: "S" },
+    d: { label: "D", size: "60px", shifted: "D" },
+    f: { label: "F", size: "60px", shifted: "F" },
+    g: { label: "G", size: "60px", shifted: "G" },
+    h: { label: "H", size: "60px", shifted: "H" },
+    j: { label: "J", size: "60px", shifted: "J" },
+    k: { label: "K", size: "60px", shifted: "K" },
+    l: { label: "L", size: "60px", shifted: "L" },
+    z: { label: "Z", size: "60px", shifted: "Z" },
+    x: { label: "X", size: "60px", shifted: "X" },
+    c: { label: "C", size: "60px", shifted: "C" },
+    v: { label: "V", size: "60px", shifted: "V" },
+    b: { label: "B", size: "60px", shifted: "B" },
+    n: { label: "N", size: "60px", shifted: "N" },
+    m: { label: "M", size: "60px", shifted: "M" },
+    1: { label: "1", size: "60px", shifted: "!" },
+    2: { label: "2", size: "60px", shifted: "@" },
+    3: { label: "3", size: "60px", shifted: "#" },
+    4: { label: "4", size: "60px", shifted: "$" },
+    5: { label: "5", size: "60px", shifted: "%" },
+    6: { label: "6", size: "60px", shifted: "^" },
+    7: { label: "7", size: "60px", shifted: "&" },
+    8: { label: "8", size: "60px", shifted: "*" },
+    9: { label: "9", size: "60px", shifted: "(" },
+    0: { label: "0", size: "60px", shifted: ")" },
+    "-": { label: "-", size: "60px", shifted: "_" },
+    "=": { label: "=", size: "60px", shifted: "+" },
+    "[": { label: "[", size: "60px", shifted: "{" },
+    "]": { label: "]", size: "60px", shifted: "}" },
+    "\\": { label: "\\", size: "120px", shifted: "|" },
+    ";": { label: ";", size: "60px", shifted: ":" },
+    "'": { label: "'", size: "60px", shifted: '"' },
+    ",": { label: ",", size: "60px", shifted: "<" },
+    ".": { label: ".", size: "60px", shifted: ">" },
+    "/": { label: "/", size: "60px", shifted: "?" },
+};
+
+const rows = [
+    ["Escape", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-", "=", "Backspace"],
+    ["Tab", "q", "w", "e", "r", "t", "y", "u", "i", "o", "p", "[", "]", "\\"],
+    ["CapsLock", "a", "s", "d", "f", "g", "h", "j", "k", "l", ";", "'", "Enter"],
+    ["ShiftLeft", "z", "x", "c", "v", "b", "n", "m", ",", ".", "/", "ShiftRight"],
+    ["ControlLeft", "MetaLeft", "AltLeft", " ", "AltRight", "Fn", "ContextMenu", "ControlRight"],
+];
+
+export default function Keyboard({ isUserTyping, isKeyboardActive }) {
     const [pressedKey, setPressedKey] = useState({});
+    const [isShiftPressed, setIsShiftPressed] = useState(false);
+    const [isCapsLockOn, setIsCapsLockOn] = useState(false);
 
     useEffect(() => {
+        if (!isUserTyping) {
+            setPressedKey({});
+            setIsShiftPressed(false);
+        }
         const handleKeyDown = (e) => {
-            if (!isUserTyping) return;
-            const key = e.key;
-            setPressedKey((prev) => ({ ...prev, [key]: true }));
+            const code = e.code;
+            setIsCapsLockOn(e.getModifierState("CapsLock"));
+            if (e.key === "Shift") {
+                setIsShiftPressed(true);
+            }
+            setPressedKey((prev) => ({ ...prev, [code]: true }));
         };
 
         const handleKeyUp = (e) => {
-            if (!isUserTyping) return;
-            const key = e.key;
-            setPressedKey((prev) => ({ ...prev, [key]: false }));
-        };
+            const code = e.code;
+            setIsCapsLockOn(e.getModifierState("CapsLock"));
 
+            if (e.key === "Shift") {
+                setIsShiftPressed(false);
+            }
+            setPressedKey((prev) => ({ ...prev, [code]: false }));
+        };
         window.addEventListener("keydown", handleKeyDown);
         window.addEventListener("keyup", handleKeyUp);
 
@@ -26,146 +109,71 @@ export default function Keyboard({ isUserTyping }) {
         };
     }, [isUserTyping]);
 
-    // Reset pressedKey when not focus
-    useEffect(() => {
-        if (!isUserTyping) {
-            setPressedKey({});
-        }
-    }, [isUserTyping]);
+    const getDisplayLabel = (key) => {
+        const data = keyData[key];
+        const isLetter = /^[a-zA-Z]+$/.test(key);
+        if (!data) return key;
 
-    const isKeyPressed = (key) => {
-        if (!isUserTyping) return false;
-        const keys = key.key;
-        if (Array.isArray(keys)) {
-            return keys.some((k) => pressedKey[k]);
-        } else if (key.key === "ShiftLeft" || key.key === "ShiftRight") {
-            return pressedKey["Shift"];
-        } else {
-            return pressedKey[keys];
+        if (isShiftPressed && data.shifted) {
+            if (isLetter && isCapsLockOn) {
+                return data.shifted.toLowerCase();
+            }
+            return data.shifted;
         }
+
+        if (!isCapsLockOn && data.shifted && isLetter) {
+            return data.shifted.toLowerCase();
+        }
+
+        return data.label;
     };
 
-    function setKeySize(key) {
-        if (key.key === '\t') {
-            return { size: '100px' };
-        } else if (key.key === ' ') {
-            return { size: '470px' };
-        } else if (key.key === 'ShiftRight') {
-            return { size: '180px' };
-        } else if (key.key === 'ShiftLeft') {
-            return { size: '160px'};
-        } else if (key.key === 'Backspace') {
-            return { size: '150px' };
-        } else if (key.key === '\\') {
-            return { size: '120px' };
-        } else if (Array.isArray(key.key) && key.key.includes('|')) {
-            return { size: '120px' };
-        } else if (key.key === 'Enter') {
-            return { size: '160px' };
-        } else if (key.key === 'CapsLock') {
-            return { size: '120px' };
-        } else if (['Control', 'Fn', 'Alt', 'ContextMenu', 'Meta'].includes(key.key)) {
-            return { size: '70px' };
-        } else {
-            return { size: '60px' };
+    const isKeyHighlighted = (key) => {
+        if (!isUserTyping) return false;
+
+        const data = keyData[key];
+        if (!data) return false;
+
+        // Check if the specific physical key is pressed.
+        if (pressedKey[key]) {
+            return true;
         }
-    }
 
-    const rows = [
-        //row 1
-        [
-            {label: 'Esc', key: 'Escape'},
-            {label: '1', key: ['1', '!']},
-            {label: '2', key: ['2', '@']},
-            {label: '3', key: ['3', '#']},
-            {label: '4', key: ['4', '$']},
-            {label: '5', key: ['5', '%']},
-            {label: '6', key: ['6', '^']},
-            {label: '7', key: ['7', '&']},
-            {label: '8', key: ['8', '*']},
-            {label: '9', key: ['9', '(']},
-            {label: '0', key: ['0', ')']},
-            {label: '-', key: ['-', '_']},
-            {label: '=', key: ['=', '+']},
-            {label: 'Backspace', key: 'Backspace'}
-        ],
-        //row 2
-        [
-            {label: 'Tab', key: '\t'},
-            {label: 'Q', key: ['q', 'Q']},
-            {label: 'W', key: ['w', 'W']},
-            {label: 'E', key: ['e', 'E']},
-            {label: 'R', key: ['r', 'R']},
-            {label: 'T', key: ['t', 'T']},
-            {label: 'Y', key: ['y', 'Y']},
-            {label: 'U', key: ['u', 'U']},
-            {label: 'I', key: ['i', 'I']},
-            {label: 'O', key: ['o', 'O']},
-            {label: 'P', key: ['p', 'P']},
-            {label: '[ {', key: ['[', '{']},
-            {label: '] }', key: [']', '}']},
-            {label: '\\ |', key: ['\\', '|']}
-        ],
-        //row 3
-        [
-            {label: 'Caps', key: 'CapsLock'},
-            {label: 'A', key: ['a', 'A']},
-            {label: 'S', key: ['s', 'S']},
-            {label: 'D', key: ['d', 'D']},
-            {label: 'F', key: ['f', 'F']},
-            {label: 'G', key: ['g', 'G']},
-            {label: 'H', key: ['h', 'H']},
-            {label: 'J', key: ['j', 'J'],},
-            {label: 'K', key: ['k', 'K'], },
-            {label: 'L', key: ['l', 'L']},
-            {label: '; :', key: [';', ':']},
-            {label: "\" '", key: ['"', "'"]},
-            {label: 'Enter', key: 'Enter'}
-        ],
-        //row 4
-        [
-            {label: 'Shift', key: 'ShiftLeft'},
-            {label: 'Z', key: ['z', 'Z']},
-            {label: 'X', key: ['x', 'X']},
-            {label: 'C', key: ['c', 'C']},
-            {label: 'V', key: ['v', 'V']},
-            {label: 'B', key: ['b', 'B']},
-            {label: 'N', key: ['n', 'N']},
-            {label: 'M', key: ['m', 'M']},
-            {label: ', <', key: [',', '<']},
-            {label: '. >', key: ['.', '>']},
-            {label: '/ ?', key: ['/', '?']},
-            {label: 'Shift', key: 'ShiftRight'}
-        ],
-        //row 5
-        [
-            {label: 'Ctrl', key: 'Control'},
-            {label: 'Win', key: 'Meta'},
-            {label: 'Alt', key: 'Alt'},
-            {label: 'Space', key: ' '},
-            {label: 'Alt', key: 'Alt'},
-            {label: 'Fn', key: 'Fn'},
-            {label: 'Menu', key: 'ContextMenu'},
-            {label: 'Ctrl', key: 'Control'}
-        ]
-        ]
+        // For letter and number keys, check for their physical key codes.
+        if (data.shifted) {
+            const letterCode = `Key${key.toUpperCase()}`;
+            const digitCode = `Digit${key}`;
+            return pressedKey[letterCode] || pressedKey[digitCode];
+        }
 
+        return false;
+    };
+
+    const hideObject = {
+        position: "absolute",
+        opacity: 0,
+        pointerEvents: "none",
+        height: 0,
+        width: 0,
+    };
 
     return (
-        <div className="grid-board">
-            {rows.map((row, rowIndex) => (
-                <div key={rowIndex} className="grid-row">
-                    {row.map((key, keyIndex) => (
-                        <button
-                            key={keyIndex}
-                            className={`grid-key ${isKeyPressed(key) ? "pressed" : ""}`}
-                            style={{ width: setKeySize(key).size }}
-                        >
-                            {key.label}
-                        </button>
-                    ))}
-                </div>
-            ))}
-        </div>
+        <>
+            <div className="grid-board" style={isKeyboardActive ? {} : { ...hideObject }}>
+                {rows.map((row, rowIndex) => (
+                    <div key={rowIndex} className="grid-row">
+                        {row.map((key, keyIndex) => (
+                            <button
+                                key={keyIndex}
+                                className={`grid-key ${isKeyHighlighted(key) ? "pressed" : ""}`}
+                                style={{ width: keyData[key]?.size || "60px" }}
+                            >
+                                {getDisplayLabel(key)}
+                            </button>
+                        ))}
+                    </div>
+                ))}
+            </div>
+        </>
     );
 }

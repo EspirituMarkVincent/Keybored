@@ -1,25 +1,34 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import Keyboard from "./Keyboard";
 import TextField from "./Text_field";
+import "./style.css";
 
 function App() {
-    // Refs for input field focus
-    const inputRef = useRef(null);
+    const [darkMode, setDarkMode] = useState(false);
+    useEffect(() => {
+        if (darkMode) {
+            document.body.classList.add("dark-mode");
+        } else {
+            document.body.classList.remove("dark-mode");
+        }
+    }, [darkMode]);
 
-    // State for text and game settings
+    // for Keyboard
+    const [isUserTyping, setIsUserTyping] = useState(false);
+    const [isKeyboardActive, setIsKeyboardActive] = useState(true);
+
     const [cursorPos, setCursorPos] = useState(0);
     const [words, setWords] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [isUserTyping, setIsUserTyping] = useState(false);
     const [gameModeSettings, setGameModeSettings] = useState({
         mode: "time",
         timeGoal: 15,
         wordGoal: 10,
     });
 
-    // Game logic state
     const [input, setInput] = useState("");
+    const inputRef = useRef(null);
     const [wordIndex, setWordIndex] = useState(0);
     const [typedHistory, setTypedHistory] = useState({});
     const [isStarted, setIsStarted] = useState(false);
@@ -27,10 +36,9 @@ function App() {
     const [timer, setTimer] = useState(gameModeSettings.timeGoal);
     const timerRef = useRef(null);
 
-    // Score state
     const [score, setScore] = useState({
-        letterScore: 0, // Correct letters
-        totalLetters: 0, // Total letters in typed words
+        letterScore: 0,
+        totalLetters: 0,
         standardWPM: 0,
         accuracy: 0,
     });
@@ -71,6 +79,45 @@ function App() {
         resetEverything();
     };
 
+    const calculateScore = () => {
+        let totalCorrect = 0;
+        let totalTyped = 0;
+
+        // Score completed words
+        Object.entries(typedHistory).forEach(([index, typedWord]) => {
+            const correctWord = words[parseInt(index)];
+            if (!correctWord) return;
+            // Count correct letters
+            for (let i = 0; i < Math.min(typedWord.length, correctWord.length); i++) {
+                if (typedWord[i] === correctWord[i]) {
+                    totalCorrect++;
+                }
+            }
+            // Count what was actually typed
+            totalTyped += typedWord.length;
+            // Penalize skipped letters ONLY after word is finished
+            if (typedWord.length < correctWord.length) {
+                totalTyped += correctWord.length - typedWord.length;
+            }
+        });
+
+        // ✅ Score current word (do not penalize skipped letters yet)
+        if (words[wordIndex]) {
+            const currentWord = words[wordIndex];
+
+            for (let i = 0; i < Math.min(input.length, currentWord.length); i++) {
+                if (input[i] === currentWord[i]) {
+                    totalCorrect++;
+                }
+            }
+
+            // Only count what was actually typed
+            totalTyped += input.length;
+        }
+
+        return { totalCorrect, totalTyped };
+    };
+
     const startTimer = () => {
         setIsStarted(true);
         timerRef.current = setInterval(() => {
@@ -81,9 +128,9 @@ function App() {
                         setIsFinished(true);
                         return 0;
                     }
-                    return prev - 1; // Decrement for time mode
+                    return prev - 1;
                 }
-                return prev + 1; // Increment for word mode
+                return prev + 1;
             });
         }, 1000);
     };
@@ -95,36 +142,52 @@ function App() {
     };
 
     const handleKeyDown = (e) => {
-        if (e.key === " " && input.trim() !== "") {
+        if (e.key === "Enter") {
+            resetEverything();
+        } else if (e.key === "Tab") {
+            restartText();
+        }
+
+        if (e.key === " ") {
             e.preventDefault();
             const trimmedInput = input.trim();
+            const currentWord = words[wordIndex] || "";
 
-            const wordToScore = words[wordIndex];
-            let correctLettersInWord = 0;
-            for (let i = 0; i < wordToScore.length; i++) {
-                if (trimmedInput[i] === wordToScore[i]) {
-                    correctLettersInWord++;
-                }
-            }
+            // If skipped/empty, fill typed History with wrong chars
+            const skippedWord =
+                trimmedInput === ""
+                    ? "_".repeat(currentWord.length) // force incorrect comparison
+                    : trimmedInput;
 
-            setScore((prev) => ({
+            setTypedHistory((prev) => ({
                 ...prev,
-                totalLetters: prev.totalLetters + wordToScore.length,
-                letterScore: prev.letterScore + correctLettersInWord,
+                [wordIndex]: skippedWord,
             }));
-            setTypedHistory((prev) => ({ ...prev, [wordIndex]: trimmedInput }));
+
             setWordIndex((prev) => prev + 1);
             setInput("");
             setCursorPos(0);
         }
     };
 
-    // get text at first run
+    // Initial run.
     useEffect(() => {
         getText();
+
+        const handleKeyDown = (e) => {
+            if (e.key === "Tab") {
+                e.preventDefault(); // stops focus from jumping
+                console.log("Global Tab detected!");
+                resetEverything();
+            }
+        };
+
+        window.addEventListener("keydown", handleKeyDown);
+        return () => {
+            window.removeEventListener("keydown", handleKeyDown);
+        };
     }, []);
 
-    // cursor tracking
     useEffect(() => {
         const handleSelectionChange = () => {
             if (document.activeElement === inputRef.current) {
@@ -135,7 +198,6 @@ function App() {
         return () => document.removeEventListener("selectionchange", handleSelectionChange);
     }, []);
 
-    // Auto foucs on input on keypress
     useEffect(() => {
         const handleGlobalKeyDown = () => {
             inputRef.current?.focus();
@@ -146,31 +208,39 @@ function App() {
         };
     }, []);
 
-    // debuggin only
-    useEffect(() => {
-        console.log(score);
-    }, [score]);
-
-    // Reset when game mode changes
     useEffect(() => {
         resetEverything();
     }, [gameModeSettings]);
 
     useEffect(() => () => clearInterval(timerRef.current), []);
 
-    // Scoring
     useEffect(() => {
+        if (!isStarted) return;
+
+        const { totalCorrect, totalTyped } = calculateScore();
+
         const elapsed =
             gameModeSettings.mode === "time" ? gameModeSettings.timeGoal - timer : timer;
 
-        if (elapsed > 0 && score.totalLetters > 0) {
-            const wpm = Math.round(score.letterScore / 5 / (elapsed / 60));
-            const acc = Math.round((score.letterScore / score.totalLetters) * 100);
-            setScore((prev) => ({ ...prev, standardWPM: wpm, accuracy: acc }));
+        if (elapsed > 0 && totalTyped > 0) {
+            const wpm = Math.round(totalCorrect / 5 / (elapsed / 60));
+            const acc = Math.round((totalCorrect / totalTyped) * 100);
+            setScore({
+                letterScore: totalCorrect,
+                totalLetters: totalTyped,
+                standardWPM: wpm,
+                accuracy: acc,
+            });
         } else {
-            setScore((prev) => ({ ...prev, standardWPM: 0, accuracy: 0 }));
+            setScore((prev) => ({
+                ...prev,
+                letterScore: totalCorrect,
+                totalLetters: totalTyped,
+                standardWPM: 0,
+                accuracy: totalTyped > 0 ? Math.round((totalCorrect / totalTyped) * 100) : 0,
+            }));
         }
-    }, [timer, score.letterScore, score.totalLetters, gameModeSettings]);
+    }, [timer, typedHistory, wordIndex, isStarted, gameModeSettings, words]);
 
     useEffect(() => {
         if (gameModeSettings.mode === "words" && wordIndex >= gameModeSettings.wordGoal) {
@@ -179,307 +249,239 @@ function App() {
         }
     }, [wordIndex, gameModeSettings]);
 
+    // Just for debugging.
+    useEffect(() => {
+        console.log(score);
+    }, [score]);
+
     return (
-        <div className="main-container">
-            <div className="gameModeSelection">
-                <div className="gameModeSelection">
-                    <button
-                        className={`gameMode ${gameModeSettings.mode === "time" ? "active" : ""}`}
-                        onClick={() => setGameModeSettings((prev) => ({ ...prev, mode: "time" }))}
-                    >
-                        Time
-                    </button>
-                    {gameModeSettings.mode === "time" && (
-                        <>
-                            <button
-                                className="gameMode timeBtn"
-                                onClick={() =>
-                                    setGameModeSettings((prev) => ({
-                                        ...prev,
-                                        timeGoal: 15,
-                                    }))
-                                }
-                            >
-                                15
-                            </button>
-                            <button
-                                className="gameMode timeBtn"
-                                onClick={() =>
-                                    setGameModeSettings((prev) => ({
-                                        ...prev,
-                                        timeGoal: 30,
-                                    }))
-                                }
-                            >
-                                30
-                            </button>
-                            <button
-                                className="gameMode timeBtn"
-                                onClick={() =>
-                                    setGameModeSettings((prev) => ({
-                                        ...prev,
-                                        timeGoal: 60,
-                                    }))
-                                }
-                            >
-                                60
-                            </button>
-                        </>
-                    )}
-                    <button
-                        className={`gameMode ${gameModeSettings.mode === "words" ? "active" : ""}`}
-                        onClick={() => setGameModeSettings((prev) => ({ ...prev, mode: "words" }))}
-                    >
-                        Words
-                    </button>
-                    {gameModeSettings.mode === "words" && (
-                        <>
-                            <button
-                                className="gameMode wordsBtn"
-                                onClick={() =>
-                                    setGameModeSettings((prev) => ({
-                                        ...prev,
-                                        wordGoal: 10,
-                                    }))
-                                }
-                            >
-                                10
-                            </button>
-                            <button
-                                className="gameMode wordsBtn"
-                                onClick={() =>
-                                    setGameModeSettings((prev) => ({
-                                        ...prev,
-                                        wordGoal: 20,
-                                    }))
-                                }
-                            >
-                                20
-                            </button>
-                            <button
-                                className="gameMode wordsBtn"
-                                onClick={() =>
-                                    setGameModeSettings((prev) => ({
-                                        ...prev,
-                                        wordGoal: 30,
-                                    }))
-                                }
-                            >
-                                30
-                            </button>
-                        </>
-                    )}
-                    <button className="gameMode newTextBtn" onClick={restartText}>
-                        New Text
-                    </button>
-                </div>
+        <>
+            <div className="header">
+                <div className="header-title"> Key</div>
+                {/* <div className="header-divider"> </div> */}
+                <button
+                    className="theme-toggle-btn header-btn"
+                    onClick={() => setDarkMode((prev) => !prev)}
+                >
+                    {darkMode ? "☀️" : "🌖"}
+                </button>
+                <button className="settings-btn header-btn">⚙️</button>
+                <button className="keyboard-toggle-btn header-btn" onClick={() => setIsKeyboardActive((prev) => !prev)}>⌨️</button>
             </div>
+            <div className="main-container">
+                <div className="menu-top">
+                    <div className="gameModeSelection">
+                        <button
+                            className={`game-mode-btn ${
+                                gameModeSettings.mode === "time" ? "active" : ""
+                            }`}
+                            onClick={() =>
+                                setGameModeSettings((prev) => ({ ...prev, mode: "time" }))
+                            }
+                        >
+                            Time
+                        </button>
+                        {gameModeSettings.mode === "time" && (
+                            <>
+                                <button
+                                    className="game-mode-btn timeBtn"
+                                    onClick={() =>
+                                        setGameModeSettings((prev) => ({
+                                            ...prev,
+                                            timeGoal: 15,
+                                        }))
+                                    }
+                                >
+                                    15
+                                </button>
+                                <button
+                                    className="game-mode-btn timeBtn"
+                                    onClick={() =>
+                                        setGameModeSettings((prev) => ({
+                                            ...prev,
+                                            timeGoal: 30,
+                                        }))
+                                    }
+                                >
+                                    30
+                                </button>
+                                <button
+                                    className="game-mode-btn timeBtn"
+                                    onClick={() =>
+                                        setGameModeSettings((prev) => ({
+                                            ...prev,
+                                            timeGoal: 60,
+                                        }))
+                                    }
+                                >
+                                    60
+                                </button>
+                            </>
+                        )}
+                        <button
+                            className={`game-mode-btn ${
+                                gameModeSettings.mode === "words" ? "active" : ""
+                            }`}
+                            onClick={() =>
+                                setGameModeSettings((prev) => ({ ...prev, mode: "words" }))
+                            }
+                        >
+                            Words
+                        </button>
+                        {gameModeSettings.mode === "words" && (
+                            <>
+                                <button
+                                    className="game-mode-btn wordsBtn"
+                                    onClick={() =>
+                                        setGameModeSettings((prev) => ({
+                                            ...prev,
+                                            wordGoal: 10,
+                                        }))
+                                    }
+                                >
+                                    10
+                                </button>
+                                <button
+                                    className="game-mode-btn wordsBtn"
+                                    onClick={() =>
+                                        setGameModeSettings((prev) => ({
+                                            ...prev,
+                                            wordGoal: 20,
+                                        }))
+                                    }
+                                >
+                                    20
+                                </button>
+                                <button
+                                    className="game-mode-btn wordsBtn"
+                                    onClick={() =>
+                                        setGameModeSettings((prev) => ({
+                                            ...prev,
+                                            wordGoal: 30,
+                                        }))
+                                    }
+                                >
+                                    30
+                                </button>
+                            </>
+                        )}
+                        <button className="game-mode-btn newTextBtn" onClick={restartText}>
+                            New Text
+                        </button>
+                    </div>
+                </div>
 
-            <TextField
-                words={words}
-                currentWordIndex={wordIndex}
-                userInput={input}
-                typedHistory={typedHistory}
-                cursorPos={cursorPos}
-            />
-
-            <div className="form-group">
-                <input
-                    className="input-field"
-                    type="text"
-                    value={input}
-                    ref={inputRef}
-                    onChange={handleInputChange}
-                    disabled={isFinished}
-                    onFocus={() => setIsUserTyping(true)}
-                    onBlur={() => setIsUserTyping(false)}
-                    autoFocus
-                    onKeyDown={(e) => {
-                        // block arrow keys, home/end
-                        if (
-                            [
-                                "ArrowLeft",
-                                "ArrowRight",
-                                "ArrowUp",
-                                "ArrowDown",
-                                "Home",
-                                "End",
-                            ].includes(e.key)
-                        ) {
-                            e.preventDefault();
-                            return;
-                        }
-                        // for space
-                        handleKeyDown(e);
-                    }}
-                    onMouseDown={(e) => {
-                        // prevent mouse from moving caret
-                        e.preventDefault();
-                        e.target.setSelectionRange(e.target.value.length, e.target.value.length);
-                    }}
-                    onSelect={(e) => {
-                        // always force caret to end
-                        e.target.setSelectionRange(e.target.value.length, e.target.value.length);
-                    }}
+                <TextField
+                    words={words}
+                    currentWordIndex={wordIndex}
+                    userInput={input}
+                    typedHistory={typedHistory}
+                    cursorPos={cursorPos}
                 />
 
-                <div className="stat-box wpm">{score.standardWPM} WPM</div>
-                <div className="stat-box time">
-                    {gameModeSettings.mode === "time"
-                        ? `${timer}s`
-                        : `${wordIndex}/${gameModeSettings.wordGoal}`}
-                </div>
-                <div className="stat-box reset-button" onClick={resetEverything}>
-                    Reset
-                </div>
-            </div>
+                <div className="form-group">
+                    <input
+                        className="input-field"
+                        type="text"
+                        value={input}
+                        ref={inputRef}
+                        onChange={handleInputChange}
+                        disabled={isFinished}
+                        onFocus={() => setIsUserTyping(true)}
+                        onBlur={() => setIsUserTyping(false)}
+                        autoFocus
+                        onKeyDown={(e) => {
+                            if (
+                                [
+                                    "ArrowLeft",
+                                    "ArrowRight",
+                                    "ArrowUp",
+                                    "ArrowDown",
+                                    "Home",
+                                    "End",
+                                ].includes(e.key)
+                            ) {
+                                e.preventDefault();
+                                return;
+                            }
+                            handleKeyDown(e);
+                        }}
+                        onMouseDown={(e) => {
+                            if (isUserTyping) e.preventDefault();
+                            e.target.setSelectionRange(
+                                e.target.value.length,
+                                e.target.value.length
+                            );
+                        }}
+                        onSelect={(e) => {
+                            e.target.setSelectionRange(
+                                e.target.value.length,
+                                e.target.value.length
+                            );
+                        }}
+                    />
 
-            {isFinished ? (
-                <>
-                    <div className="gameResult">Game Result</div>
-                    <div className="gameResult">WPM: {score.standardWPM}</div>
-                    <div className="gameResult">Accuracy: {score.accuracy}%</div>
-                </>
-            ) : (
-                <Keyboard isUserTyping={isUserTyping} />
-            )}
-        </div>
+                    <div className="stat-box wpm">{score.standardWPM} WPM</div>
+                    <div className="stat-box time">
+                        {gameModeSettings.mode === "time"
+                            ? `${timer}s`
+                            : `${wordIndex}/${gameModeSettings.wordGoal}`}
+                    </div>
+                    <div className="stat-box reset-button" onClick={resetEverything}>
+                        Reset
+                    </div>
+                </div>
+
+                {isFinished ? (
+                    <>
+                        <div className="gameResult">Game Result</div>
+                        <div className="gameResult">WPM: {score.standardWPM}</div>
+                        <div className="gameResult">Accuracy: {score.accuracy}%</div>
+                    </>
+                ) : (
+                    <Keyboard 
+                        isUserTyping={isUserTyping} 
+                        isKeyboardActive={isKeyboardActive}
+                    />
+                )}
+            </div>
+        </>
     );
 }
 
+// prettier-ignore
 export const localText = [
-    "apple",
-    "ape",
-    "axiom",
-    "amber",
-    "aroma",
-    "braid",
-    "baker",
-    "banks",
-    "barge",
-    "bases",
-    "cable",
-    "cache",
-    "cakes",
-    "calls",
-    "camps",
-    "dance",
-    "darts",
-    "dates",
-    "dawns",
-    "deals",
-    "eagle",
-    "eases",
-    "eaten",
-    "edges",
-    "eject",
-    "flute",
-    "fable",
-    "fancy",
-    "fence",
-    "finds",
-    "glide",
-    "gnome",
-    "graft",
-    "grain",
-    "grape",
-    "honey",
-    "hound",
-    "house",
-    "haste",
-    "haven",
-    "igloo",
-    "icy",
-    "image",
-    "inch",
-    "index",
-    "jelly",
-    "jade",
-    "jaguar",
-    "jawed",
-    "jests",
-    "kite",
-    "knot",
-    "knead",
-    "knell",
-    "knock",
-    "lance",
-    "lark",
-    "laser",
-    "latch",
-    "lauds",
-    "mango",
-    "mere",
-    "mesh",
-    "mice",
-    "might",
-    "nerve",
-    "nest",
-    "night",
-    "nile",
-    "ninth",
-    "ocean",
-    "oath",
-    "olive",
-    "omen",
-    "onion",
-    "pulse",
-    "pain",
-    "paint",
-    "pales",
-    "pants",
-    "queen",
-    "quake",
-    "quark",
-    "quay",
-    "quest",
-    "ranch",
-    "rave",
-    "raven",
-    "rays",
-    "reach",
-    "sage",
-    "sail",
-    "sake",
-    "sale",
-    "says",
-    "tiger",
-    "tale",
-    "tame",
-    "tape",
-    "task",
-    "umpire",
-    "used",
-    "user",
-    "utah",
-    "utopia",
-    "vase",
-    "vast",
-    "vial",
-    "vice",
-    "view",
-    "wagon",
-    "wail",
-    "wane",
-    "warp",
-    "wash",
-    "xray",
-    "xylem",
-    "xylo",
-    "xyris",
-    "xyst",
-    "yacht",
-    "yale",
-    "yard",
-    "yarn",
-    "yeast",
-    "zest",
-    "zing",
-    "zion",
-    "zips",
-    "zones",
+  "apple", "ape", "axiom", "amber", "aroma",
+  "braid", "baker", "banks", "barge", "bases",
+  "cable", "cache", "cakes", "calls", "camps",
+  "dance", "darts", "dates", "dawns", "deals",
+  "eagle", "eases", "eaten", "edges", "eject",
+  "flute", "fable", "fancy", "fence", "finds",
+  "glide", "gnome", "graft", "grain", "grape",
+  "honey", "hound", "house", "haste", "haven",
+  "igloo", "icy", "image", "inch", "index",
+  "jelly", "jade", "jaguar", "jawed", "jests",
+  "kite", "knot", "knead", "knell", "knock",
+  "lance", "lark", "laser", "latch", "lauds",
+  "mango", "mere", "mesh", "mice", "might",
+  "nerve", "nest", "night", "nile", "ninth",
+  "ocean", "oath", "olive", "omen", "onion",
+  "pulse", "pain", "paint", "pales", "pants",
+  "queen", "quake", "quark", "quay", "quest",
+  "ranch", "rave", "raven", "rays", "reach",
+  "sage", "sail", "sake", "sale", "says",
+  "tiger", "tale", "tame", "tape", "task",
+  "umpire", "used", "user", "utah", "utopia",
+  "vase", "vast", "vial", "vice", "view",
+  "wagon", "wail", "wane", "warp", "wash",
+  "xray", "xylem", "xylo", "xyris", "xyst",
+  "yacht", "yale", "yard", "yarn", "yeast",
+  "zest", "zing", "zion", "zips", "zones",
 ];
-
 localText.sort(() => Math.random() - 0.5);
 
-createRoot(document.getElementById("root")).render(<App />);
+createRoot(document.getElementById("root")).render(
+    <StrictMode>
+        <App />
+    </StrictMode>
+);
