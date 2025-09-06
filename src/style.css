@@ -52,7 +52,6 @@ body {
     padding: 0.5rem 1rem;
     gap: 7px;
     background-color: var(--bg-primary);
-    transition: all 0.3s ease;
 }
 
 .header-title {
@@ -104,7 +103,6 @@ body {
     align-items: center;
     min-height: 100vh;
     background-color: var(--bg-primary);
-    transition: all 0.3s ease;
 }
 
 .gameModeSelection {
