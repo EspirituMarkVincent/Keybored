@@ -174,9 +174,8 @@ export default function Keyboard({
     return (
         <>
             <div
-                className="grid-board"
+                className={`grid-board ${isKeyboardActive ? "" : "hidden"}`}
                 style={{
-                    ...(isKeyboardActive ? {} : hideObject),
                     ...(showKeyboardContainer
                         ? {}
                         : { background: "none", boxShadow: "none", border: "none" }),

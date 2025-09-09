@@ -128,8 +128,8 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black */
-    z-index: 99; /* Below the settings window */
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 99;
     visibility: hidden;
     opacity: 0;
     transition: all 0.3s ease-in-out;
@@ -213,6 +213,7 @@ body {
     margin: 15px;
     border: 1px solid var(--border-color);
     box-shadow: 0 2px 8px var(--shadow);
+    transition: all 0.3s ease;
 }
 
 .text-container {
@@ -276,6 +277,12 @@ body {
     flex-direction: row;
     padding: 0%;
     gap: 10px;
+    justify-content: center;
+    transition: all 0.3s ease-in-out;
+}
+
+.form-group.finished {
+    gap: 0;
 }
 
 .input-field {
@@ -288,8 +295,18 @@ body {
     font-size: 24px;
     text-align: center;
     font-family: monospace;
-    transition: all 0.3s ease;
     box-shadow: 0 2px 4px var(--shadow);
+    transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out, width 0.3s ease-in-out,
+        padding 0.3s ease-in-out;
+    overflow: hidden;
+}
+
+.input-field.hidden {
+    transform: scale(0);
+    width: 0;
+    opacity: 0;
+    padding: 0;
+    border: none;
 }
 
 .input-field:focus {
@@ -304,7 +321,6 @@ body {
 }
 
 .stat-box {
-    height: 100%;
     width: 140px;
     display: flex;
     align-items: center;
@@ -336,13 +352,18 @@ body {
 .grid-board {
     margin-top: 15px;
     justify-content: center;
-    /* transform: scale(1); */
     transform-origin: top center;
     padding: 20px;
     background-color: var(--bg-secondary);
     border-radius: 12px;
     border: 1px solid var(--border-color);
     box-shadow: 0 4px 12px var(--shadow);
+    transition: all 0.3s ease;
+}
+
+.grid-board.hidden {
+    transform: scale(0);
+    opacity: 0;
 }
 
 .grid-row {

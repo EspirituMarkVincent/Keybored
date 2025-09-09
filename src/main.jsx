@@ -107,7 +107,7 @@ function App() {
             }
         });
 
-        // Score current word (do not penalize skipped letters yet)
+        // Score current word, do not penalize skipped letters yet
         if (words[wordIndex]) {
             const currentWord = words[wordIndex];
 
@@ -152,18 +152,12 @@ function App() {
             resetEverything();
         } else if (e.key === "Tab") {
             restartText();
-        }
-
-        if (e.key === " ") {
+        } else if (e.key === " ") {
             e.preventDefault();
             const trimmedInput = input.trim();
             const currentWord = words[wordIndex] || "";
 
-            // If skipped/empty, fill typed History with wrong chars.
-            const skippedWord =
-                trimmedInput === ""
-                    ? "_".repeat(currentWord.length) // force incorrect comparison.
-                    : trimmedInput;
+            const skippedWord = trimmedInput === "" ? "_".repeat(currentWord.length) : trimmedInput;
 
             setTypedHistory((prev) => ({
                 ...prev,
@@ -173,6 +167,19 @@ function App() {
             setWordIndex((prev) => prev + 1);
             setInput("");
             setCursorPos(0);
+        } else if (e.key === "Backspace" && input === "" && wordIndex > 0) {
+            // New logic to go back to the previous word
+            e.preventDefault();
+            const newWordIndex = wordIndex - 1;
+            const newTypedHistory = { ...typedHistory };
+            const prevWord = newTypedHistory[newWordIndex];
+
+            delete newTypedHistory[newWordIndex];
+
+            setWordIndex(newWordIndex);
+            setInput(prevWord);
+            setTypedHistory(newTypedHistory);
+            setCursorPos(prevWord.length);
         }
     };
 
@@ -264,7 +271,6 @@ function App() {
     useEffect(() => {
         if (gameModeSettings.mode === "words" && wordIndex >= gameModeSettings.wordGoal) {
             setIsFinished(true);
-            a;
             clearInterval(timerRef.current);
         }
     }, [wordIndex, gameModeSettings]);
@@ -278,6 +284,7 @@ function App() {
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
     const [showKeyboardContainer, setShowKeyboardContainer] = useState(true);
     const [showTextContainer, setShowTextContainer] = useState(true);
+    const [showInputField, setShowInputField] = useState(false);
 
     const settingsWindow = (
         <div className={`settings-window ${isSettingsOpen ? "open" : ""}`}>
@@ -289,50 +296,41 @@ function App() {
                         Hide Keyboard
                         <button
                             className="settings-toggle"
-                            onClick={() => setIsKeyboardActive(false)}
+                            onClick={() => setIsKeyboardActive((prev) => !prev)}
                         >
-                            off
-                        </button>
-                        <button
-                            className="settings-toggle"
-                            onClick={() => setIsKeyboardActive(true)}
-                        >
-                            on
+                            {isKeyboardActive ? "on" : "off"}
                         </button>
                     </div>
                     <div className="settings-h3">
                         Container
                         <button
                             className="settings-toggle"
-                            onClick={() => setShowKeyboardContainer(false)}
+                            onClick={() => setShowKeyboardContainer((prev) => !prev)}
                         >
-                            off
-                        </button>
-                        <button
-                            className="settings-toggle"
-                            onClick={() => setShowKeyboardContainer(true)}
-                        >
-                            on
+                            {showKeyboardContainer ? "on" : "off"}
                         </button>
                     </div>
                 </div>
                 <div className="settings-h2">
                     Text
-                    <div className="settings-h3 ">
-                        Hide Text Container
+                    <div className="settings-h3">
+                        Container
                         <button
                             className="settings-toggle"
-                            onClick={() => setShowTextContainer(false)}
+                            onClick={() => setShowTextContainer((prev) => !prev)}
                         >
-                            off
-                        </button>
-                        <button
-                            className="settings-toggle"
-                            onClick={() => setShowTextContainer(true)}
-                        >
-                            on
+                            {showTextContainer ? "on" : "off"}
                         </button>
                     </div>
+                </div>
+                <div className="settings-h2">
+                    Input Field
+                    <button
+                        className="settings-toggle"
+                        onClick={() => setShowInputField((prev) => !prev)}
+                    >
+                        {showInputField ? "on" : "off"}
+                    </button>
                 </div>
             </div>
             <div className="settings-exit-container">
@@ -495,7 +493,7 @@ function App() {
 
                 <div className="form-group">
                     <input
-                        className="input-field"
+                        className={`input-field ${showInputField ? "hidden" : ""}`}
                         type="text"
                         value={input}
                         ref={inputRef}
@@ -567,32 +565,32 @@ function App() {
 
 // prettier-ignore
 export const localText = [
-  "apple", "ape", "axiom", "amber", "aroma",
-  "braid", "baker", "banks", "barge", "bases",
-  "cable", "cache", "cakes", "calls", "camps",
-  "dance", "darts", "dates", "dawns", "deals",
-  "eagle", "eases", "eaten", "edges", "eject",
-  "flute", "fable", "fancy", "fence", "finds",
-  "glide", "gnome", "graft", "grain", "grape",
-  "honey", "hound", "house", "haste", "haven",
-  "igloo", "icy", "image", "inch", "index",
-  "jelly", "jade", "jaguar", "jawed", "jests",
-  "kite", "knot", "knead", "knell", "knock",
-  "lance", "lark", "laser", "latch", "lauds",
-  "mango", "mere", "mesh", "mice", "might",
-  "nerve", "nest", "night", "nile", "ninth",
-  "ocean", "oath", "olive", "omen", "onion",
-  "pulse", "pain", "paint", "pales", "pants",
-  "queen", "quake", "quark", "quay", "quest",
-  "ranch", "rave", "raven", "rays", "reach",
-  "sage", "sail", "sake", "sale", "says",
-  "tiger", "tale", "tame", "tape", "task",
-  "umpire", "used", "user", "utah", "utopia",
-  "vase", "vast", "vial", "vice", "view",
-  "wagon", "wail", "wane", "warp", "wash",
-  "xray", "xylem", "xylo", "xyris", "xyst",
-  "yacht", "yale", "yard", "yarn", "yeast",
-  "zest", "zing", "zion", "zips", "zones",
+    "apple", "ape", "axiom", "amber", "aroma",
+    "braid", "baker", "banks", "barge", "bases",
+    "cable", "cache", "cakes", "calls", "camps",
+    "dance", "darts", "dates", "dawns", "deals",
+    "eagle", "eases", "eaten", "edges", "eject",
+    "flute", "fable", "fancy", "fence", "finds",
+    "glide", "gnome", "graft", "grain", "grape",
+    "honey", "hound", "house", "haste", "haven",
+    "igloo", "icy", "image", "inch", "index",
+    "jelly", "jade", "jaguar", "jawed", "jests",
+    "kite", "knot", "knead", "knell", "knock",
+    "lance", "lark", "laser", "latch", "lauds",
+    "mango", "mere", "mesh", "mice", "might",
+    "nerve", "nest", "night", "nile", "ninth",
+    "ocean", "oath", "olive", "omen", "onion",
+    "pulse", "pain", "paint", "pales", "pants",
+    "queen", "quake", "quark", "quay", "quest",
+    "ranch", "rave", "raven", "rays", "reach",
+    "sage", "sail", "sake", "sale", "says",
+    "tiger", "tale", "tame", "tape", "task",
+    "umpire", "used", "user", "utah", "utopia",
+    "vase", "vast", "vial", "vice", "view",
+    "wagon", "wail", "wane", "warp", "wash",
+    "xray", "xylem", "xylo", "xyris", "xyst",
+    "yacht", "yale", "yard", "yarn", "yeast",
+    "zest", "zing", "zion", "zips", "zones",
 ];
 localText.sort(() => Math.random() - 0.5);
 
