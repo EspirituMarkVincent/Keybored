@@ -43,6 +43,12 @@ function App() {
         accuracy: 0,
     });
 
+    const [result, setResult] = useState({
+        accuracy: 0,
+        wpm: 0,
+        typedHistory: {},
+    });
+
     const getText = () => {
         setLoading(true);
         fetch("https://random-word-api.vercel.app/api?words=500")
@@ -95,13 +101,13 @@ function App() {
             }
             // Count what was actually typed
             totalTyped += typedWord.length;
-            // Penalize skipped letters ONLY after word is finished
+            // Penalize skipped letters only after word is finished
             if (typedWord.length < correctWord.length) {
                 totalTyped += correctWord.length - typedWord.length;
             }
         });
 
-        // ✅ Score current word (do not penalize skipped letters yet)
+        // Score current word (do not penalize skipped letters yet)
         if (words[wordIndex]) {
             const currentWord = words[wordIndex];
 
@@ -153,10 +159,10 @@ function App() {
             const trimmedInput = input.trim();
             const currentWord = words[wordIndex] || "";
 
-            // If skipped/empty, fill typed History with wrong chars
+            // If skipped/empty, fill typed History with wrong chars.
             const skippedWord =
                 trimmedInput === ""
-                    ? "_".repeat(currentWord.length) // force incorrect comparison
+                    ? "_".repeat(currentWord.length) // force incorrect comparison.
                     : trimmedInput;
 
             setTypedHistory((prev) => ({
@@ -176,7 +182,7 @@ function App() {
 
         const handleKeyDown = (e) => {
             if (e.key === "Tab") {
-                e.preventDefault(); // stops focus from jumping
+                e.preventDefault(); // stops focus from jumping.
                 console.log("Global Tab detected!");
                 resetEverything();
             }
@@ -208,12 +214,14 @@ function App() {
         };
     }, []);
 
+    // Reset on game mode change.
     useEffect(() => {
         resetEverything();
     }, [gameModeSettings]);
 
     useEffect(() => () => clearInterval(timerRef.current), []);
 
+    // Calculate score.
     useEffect(() => {
         if (!isStarted) return;
 
@@ -243,8 +251,20 @@ function App() {
     }, [timer, typedHistory, wordIndex, isStarted, gameModeSettings, words]);
 
     useEffect(() => {
+        if (isFinished && score.standardWPM > 0) {
+            setResult((prev) => ({
+                ...prev,
+                wpm: score.standardWPM,
+                accuracy: score.accuracy,
+                typedHistory: typedHistory,
+            }));
+        }
+    }, [isFinished]);
+
+    useEffect(() => {
         if (gameModeSettings.mode === "words" && wordIndex >= gameModeSettings.wordGoal) {
             setIsFinished(true);
+            a;
             clearInterval(timerRef.current);
         }
     }, [wordIndex, gameModeSettings]);
@@ -254,19 +274,112 @@ function App() {
         console.log(score);
     }, [score]);
 
+    // For settings window
+    const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+    const [showKeyboardContainer, setShowKeyboardContainer] = useState(true);
+    const [showTextContainer, setShowTextContainer] = useState(true);
+
+    const settingsWindow = (
+        <div className={`settings-window ${isSettingsOpen ? "open" : ""}`}>
+            <div className="settings-h1">
+                UI Settings
+                <div className="settings-h2">
+                    Keyboard
+                    <div className="settings-h3">
+                        Hide Keyboard
+                        <button
+                            className="settings-toggle"
+                            onClick={() => setIsKeyboardActive(false)}
+                        >
+                            off
+                        </button>
+                        <button
+                            className="settings-toggle"
+                            onClick={() => setIsKeyboardActive(true)}
+                        >
+                            on
+                        </button>
+                    </div>
+                    <div className="settings-h3">
+                        Container
+                        <button
+                            className="settings-toggle"
+                            onClick={() => setShowKeyboardContainer(false)}
+                        >
+                            off
+                        </button>
+                        <button
+                            className="settings-toggle"
+                            onClick={() => setShowKeyboardContainer(true)}
+                        >
+                            on
+                        </button>
+                    </div>
+                </div>
+                <div className="settings-h2">
+                    Text
+                    <div className="settings-h3 ">
+                        Hide Text Container
+                        <button
+                            className="settings-toggle"
+                            onClick={() => setShowTextContainer(false)}
+                        >
+                            off
+                        </button>
+                        <button
+                            className="settings-toggle"
+                            onClick={() => setShowTextContainer(true)}
+                        >
+                            on
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div className="settings-exit-container">
+                <div
+                    className="settings-close-btn settings-btn stat-box"
+                    onClick={() => setIsSettingsOpen(false)}
+                >
+                    Save
+                </div>
+                <div
+                    className="settings-close-btn settings-btn stat-box"
+                    onClick={() => setIsSettingsOpen(false)}
+                >
+                    Close
+                </div>
+            </div>
+        </div>
+    );
+
     return (
         <>
+            <div
+                className={`settings-overlay ${isSettingsOpen ? "open" : ""}`}
+                onClick={() => setIsSettingsOpen(false)}
+            ></div>
+            {settingsWindow}
             <div className="header-container">
-                <div className="header-title"> Keybored</div>
-                {/* <div className="header-divider"> </div> */}
+                <div className="header-txt"> Keybored</div>
+                <div className="header-divider"> </div>
                 <button
                     className="theme-toggle-btn header-btn"
                     onClick={() => setDarkMode((prev) => !prev)}
                 >
                     {darkMode ? "☀️" : "🌖"}
                 </button>
-                <button className="settings-btn header-btn">⚙️</button>
-                <button className="keyboard-toggle-btn header-btn" onClick={() => setIsKeyboardActive((prev) => !prev)}>⌨️</button>
+                <button
+                    className="keyboard-toggle-btn header-btn"
+                    onClick={() => setIsKeyboardActive((prev) => !prev)}
+                >
+                    ⌨️
+                </button>
+                <button
+                    className="settings-btn header-btn"
+                    onClick={() => setIsSettingsOpen((prev) => !prev)}
+                >
+                    ⚙️
+                </button>
             </div>
             <div className="main-container">
                 <div className="menu-top">
@@ -377,6 +490,7 @@ function App() {
                     userInput={input}
                     typedHistory={typedHistory}
                     cursorPos={cursorPos}
+                    showTextContainer={showTextContainer}
                 />
 
                 <div className="form-group">
@@ -439,9 +553,11 @@ function App() {
                         <div className="result">Accuracy: {score.accuracy}%</div>
                     </div>
                 ) : (
-                    <Keyboard 
-                        isUserTyping={isUserTyping} 
+                    <Keyboard
+                        isUserTyping={isUserTyping}
                         isKeyboardActive={isKeyboardActive}
+                        showKeyboardContainer={showKeyboardContainer}
+                        showTextContainer={showTextContainer}
                     />
                 )}
             </div>

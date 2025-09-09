@@ -15,7 +15,7 @@ const keyData = {
     MetaLeft: { label: "Win", size: "70px" },
     ContextMenu: { label: "Menu", size: "70px" },
     Fn: { label: "Fn", size: "70px" },
-    " ": { label: "Space", size: "470px" },
+    Space: { label: "Space", size: "470px" },
     q: { label: "Q", size: "60px", shifted: "Q" },
     w: { label: "W", size: "60px", shifted: "W" },
     e: { label: "E", size: "60px", shifted: "E" },
@@ -69,10 +69,24 @@ const rows = [
     ["Tab", "q", "w", "e", "r", "t", "y", "u", "i", "o", "p", "[", "]", "\\"],
     ["CapsLock", "a", "s", "d", "f", "g", "h", "j", "k", "l", ";", "'", "Enter"],
     ["ShiftLeft", "z", "x", "c", "v", "b", "n", "m", ",", ".", "/", "ShiftRight"],
-    ["ControlLeft", "MetaLeft", "AltLeft", " ", "AltRight", "Fn", "ContextMenu", "ControlRight"],
+    [
+        "ControlLeft",
+        "MetaLeft",
+        "AltLeft",
+        "Space",
+        "AltRight",
+        "Fn",
+        "ContextMenu",
+        "ControlRight",
+    ],
 ];
 
-export default function Keyboard({ isUserTyping, isKeyboardActive }) {
+export default function Keyboard({
+    isUserTyping = true,
+    isKeyboardActive = true,
+    showKeyboardContainer = true,
+    onlyLetters = false,
+}) {
     const [pressedKey, setPressedKey] = useState({});
     const [isShiftPressed, setIsShiftPressed] = useState(false);
     const [isCapsLockOn, setIsCapsLockOn] = useState(false);
@@ -159,7 +173,15 @@ export default function Keyboard({ isUserTyping, isKeyboardActive }) {
 
     return (
         <>
-            <div className="grid-board" style={isKeyboardActive ? {} : { ...hideObject }}>
+            <div
+                className="grid-board"
+                style={{
+                    ...(isKeyboardActive ? {} : hideObject),
+                    ...(showKeyboardContainer
+                        ? {}
+                        : { background: "none", boxShadow: "none", border: "none" }),
+                }}
+            >
                 {rows.map((row, rowIndex) => (
                     <div key={rowIndex} className="grid-row">
                         {row.map((key, keyIndex) => (
