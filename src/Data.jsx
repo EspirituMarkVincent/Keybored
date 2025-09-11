@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useEffect, useContext, useState } from "react";
 
 const DataContext = createContext();
 
@@ -33,6 +33,10 @@ export const DataProvider = ({ children }) => {
             history: [...prev.history, newScore],
         }));
     };
+
+    useEffect(() => {
+        console.log("Settings updated:", settings);
+    }, [settings]);
 
     return (
         <DataContext.Provider

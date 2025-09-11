@@ -21,10 +21,7 @@ function App() {
         }
     }, [darkMode]);
 
-    // for Keyboard
     const [isUserTyping, setIsUserTyping] = useState(false);
-    const [isKeyboardActive, setIsKeyboardActive] = useState(true);
-
     const [cursorPos, setCursorPos] = useState(0);
     const [words, setWords] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -492,12 +489,7 @@ function App() {
                         <div className="result">Accuracy: {score.accuracy}%</div>
                     </div>
                 ) : (
-                    <Keyboard
-                        isUserTyping={isUserTyping}
-                        isKeyboardActive={isKeyboardActive}
-                        showKeyboardContainer={showKeyboardContainer}
-                        showTextContainer={showTextContainer}
-                    />
+                    <Keyboard isUserTyping={isUserTyping} />
                 )}
             </div>
         </>
