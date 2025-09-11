@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import "./styles/Keyboard.css";
 
 const keyData = {
     Escape: { label: "Esc", size: "60px" },

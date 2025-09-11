@@ -2,9 +2,16 @@ import { useState, useRef, useEffect, StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import Keyboard from "./Keyboard";
 import TextField from "./Text_field";
-import "./style.css";
+import SettingsUI from "./Settings";
+import { DataProvider, useData } from "./Data";
+import "./styles/main.css";
+import "./styles/Keyboard.css";
+import "./styles/Settings.css";
+import "./styles/Text_field.css";
 
 function App() {
+    const { settings } = useData(); 
+    
     const [darkMode, setDarkMode] = useState(false);
     useEffect(() => {
         if (darkMode) {
@@ -286,85 +293,19 @@ function App() {
     const [showTextContainer, setShowTextContainer] = useState(true);
     const [showInputField, setShowInputField] = useState(false);
 
-    const settingsWindow = (
-        <div className={`settings-window ${isSettingsOpen ? "open" : ""}`}>
-            <div className="settings-h1">
-                UI Settings
-                <div className="settings-h2">
-                    Keyboard
-                    <div className="settings-h3">
-                        Hide Keyboard
-                        <button
-                            className="settings-toggle"
-                            onClick={() => setIsKeyboardActive((prev) => !prev)}
-                        >
-                            {isKeyboardActive ? "on" : "off"}
-                        </button>
-                    </div>
-                    <div className="settings-h3">
-                        Container
-                        <button
-                            className="settings-toggle"
-                            onClick={() => setShowKeyboardContainer((prev) => !prev)}
-                        >
-                            {showKeyboardContainer ? "on" : "off"}
-                        </button>
-                    </div>
-                </div>
-                <div className="settings-h2">
-                    Text
-                    <div className="settings-h3">
-                        Container
-                        <button
-                            className="settings-toggle"
-                            onClick={() => setShowTextContainer((prev) => !prev)}
-                        >
-                            {showTextContainer ? "on" : "off"}
-                        </button>
-                    </div>
-                </div>
-                <div className="settings-h2">
-                    Input Field
-                    <button
-                        className="settings-toggle"
-                        onClick={() => setShowInputField((prev) => !prev)}
-                    >
-                        {showInputField ? "on" : "off"}
-                    </button>
-                </div>
-            </div>
-            <div className="settings-exit-container">
-                <div
-                    className="settings-close-btn settings-btn stat-box"
-                    onClick={() => setIsSettingsOpen(false)}
-                >
-                    Save
-                </div>
-                <div
-                    className="settings-close-btn settings-btn stat-box"
-                    onClick={() => setIsSettingsOpen(false)}
-                >
-                    Close
-                </div>
-            </div>
-        </div>
-    );
-
     return (
         <>
-            <div
-                className={`settings-overlay ${isSettingsOpen ? "open" : ""}`}
-                onClick={() => setIsSettingsOpen(false)}
-            ></div>
-            {settingsWindow}
+            {/* New Settings Component */}
+            <SettingsUI isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
+
             <div className="header-container">
-                <div className="header-txt"> Keybored</div>
-                <div className="header-divider"> </div>
+                <div className="header-txt">Keybored</div>
+                <div className="divider"></div>
                 <button
                     className="theme-toggle-btn header-btn"
                     onClick={() => setDarkMode((prev) => !prev)}
                 >
-                    {darkMode ? "☀️" : "🌖"}
+                    {darkMode ? "🌒" : "🌙"}
                 </button>
                 <button
                     className="keyboard-toggle-btn header-btn"
@@ -596,6 +537,8 @@ localText.sort(() => Math.random() - 0.5);
 
 createRoot(document.getElementById("root")).render(
     <StrictMode>
-        <App />
+        <DataProvider>
+            <App />
+        </DataProvider>
     </StrictMode>
 );

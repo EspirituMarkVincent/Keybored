@@ -1,0 +1,66 @@
+/* Keyboard div */
+.grid-board {
+    margin-top: 15px;
+    justify-content: center;
+    transform-origin: top center;
+    padding: 20px;
+    background-color: var(--bg-secondary);
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 12px var(--shadow);
+    transition: all 0.3s ease;
+}
+
+.grid-board.hidden {
+    transform: scale(0);
+    opacity: 0;
+}
+
+.grid-row {
+    display: flex;
+    justify-content: space-between;
+}
+
+.grid-key {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    padding: 0;
+    border-radius: 8px;
+    height: 60px;
+    font-size: 18px;
+    font-weight: 500;
+    border: 1px solid var(--border-color);
+    margin: 2px;
+    align-items: center;
+    justify-content: center;
+    outline: none;
+    font-family: "Poppins", sans-serif;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 3px var(--key-shadow);
+}
+
+.grid-key.pressed {
+    background-color: var(--highlight-bg);
+    border-color: var(--border-hover);
+    transform: translateY(1px);
+    box-shadow: none;
+}
+
+.grid-key:hover {
+    background-color: var(--button-hover);
+}
+
+.keyboard-settings-container {
+    color: var(--text-primary);
+    background-color: var(--bg-secondary);
+    font-size: 18px;
+    background: none;
+    border: none;
+}
+
+.keyboard-toggle {
+    border: none;
+    background: none;
+    font-family: "Poppins", sans-serif;
+    align-items: center;
+}
