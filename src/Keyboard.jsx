@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { useData } from "./Data";
 import "./styles/Keyboard.css";
 
 const keyData = {
@@ -83,8 +82,12 @@ const rows = [
     ],
 ];
 
-export default function Keyboard({ isUserTyping = true }) {
-    const { settings } = useData();
+export default function Keyboard({
+    isUserTyping = true,
+    isKeyboardActive = true,
+    showKeyboardContainer = true,
+    onlyLetters = false,
+}) {
     const [pressedKey, setPressedKey] = useState({});
     const [isShiftPressed, setIsShiftPressed] = useState(false);
     const [isCapsLockOn, setIsCapsLockOn] = useState(false);
@@ -106,6 +109,7 @@ export default function Keyboard({ isUserTyping = true }) {
         const handleKeyUp = (e) => {
             const code = e.code;
             setIsCapsLockOn(e.getModifierState("CapsLock"));
+
             if (e.key === "Shift") {
                 setIsShiftPressed(false);
             }
@@ -145,8 +149,12 @@ export default function Keyboard({ isUserTyping = true }) {
         const data = keyData[key];
         if (!data) return false;
 
-        if (pressedKey[key]) return true;
+        // Check if the specific physical key is pressed.
+        if (pressedKey[key]) {
+            return true;
+        }
 
+        // For letter and number keys, check for their physical key codes.
         if (data.shifted) {
             const letterCode = `Key${key.toUpperCase()}`;
             const digitCode = `Digit${key}`;
@@ -156,32 +164,38 @@ export default function Keyboard({ isUserTyping = true }) {
         return false;
     };
 
+    const hideObject = {
+        position: "absolute",
+        opacity: 0,
+        pointerEvents: "none",
+        height: 0,
+        width: 0,
+    };
+
     return (
-        <div
-            className={`grid-board ${!settings.keyboard.visible ? "hidden" : ""}`}
-            style={{
-                ...(settings.keyboard.container
-                    ? {}
-                    : { background: "none", boxShadow: "none", border: "none" }),
-            }}
-        >
-            {rows.map((row, rowIndex) => (
-                <div key={rowIndex} className="grid-row">
-                    {row.map((key, keyIndex) => (
-                        <button
-                            key={keyIndex}
-                            className={`grid-key ${
-                                settings.keyboard.highlightKeys && isKeyHighlighted(key)
-                                    ? "pressed"
-                                    : ""
-                            }`}
-                            style={{ width: keyData[key]?.size || "60px" }}
-                        >
-                            {getDisplayLabel(key)}
-                        </button>
-                    ))}
-                </div>
-            ))}
-        </div>
+        <>
+            <div
+                className={`grid-board ${isKeyboardActive ? "" : "hidden"}`}
+                style={{
+                    ...(showKeyboardContainer
+                        ? {}
+                        : { background: "none", boxShadow: "none", border: "none" }),
+                }}
+            >
+                {rows.map((row, rowIndex) => (
+                    <div key={rowIndex} className="grid-row">
+                        {row.map((key, keyIndex) => (
+                            <button
+                                key={keyIndex}
+                                className={`grid-key ${isKeyHighlighted(key) ? "pressed" : ""}`}
+                                style={{ width: keyData[key]?.size || "60px" }}
+                            >
+                                {getDisplayLabel(key)}
+                            </button>
+                        ))}
+                    </div>
+                ))}
+            </div>
+        </>
     );
 }

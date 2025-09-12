@@ -1,8 +1,42 @@
-import React from "react";
-import { useData } from "./Data";
+import React, { useState } from "react";
+// import "./styles/Settings.css";
 
 const SettingsUI = ({ isOpen, onClose }) => {
-    const { settings, setSettings, toggleSetting } = useData();
+    const [settings, setSettings] = useState({
+        keyboard: {
+            visible: true,
+            container: true,
+            highlightKeys: true,
+        },
+        text: {
+            container: true,
+            fontSize: "medium",
+            lineHeight: "normal",
+        },
+        input: {
+            visible: false,
+            autoFocus: true,
+        },
+        theme: {
+            mode: "light",
+            colorScheme: "default",
+        },
+        game: {
+            showWPM: true,
+            showAccuracy: true,
+            soundEffects: false,
+        },
+    });
+
+    const toggleSetting = (category, key) => {
+        setSettings((prev) => ({
+            ...prev,
+            [category]: {
+                ...prev[category],
+                [key]: !prev[category][key],
+            },
+        }));
+    };
 
     const updateSetting = (category, key, value) => {
         setSettings((prev) => ({

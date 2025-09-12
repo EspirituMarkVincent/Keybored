@@ -3,14 +3,12 @@ import { createRoot } from "react-dom/client";
 import Keyboard from "./Keyboard";
 import TextField from "./Text_field";
 import SettingsUI from "./Settings";
-import { DataProvider, useData } from "./Data";
 import "./styles/main.css";
 import "./styles/Keyboard.css";
 import "./styles/Settings.css";
 import "./styles/Text_field.css";
 
 function App() {
-    const { settings } = useData(); 
     
     const [darkMode, setDarkMode] = useState(false);
     useEffect(() => {
@@ -21,7 +19,10 @@ function App() {
         }
     }, [darkMode]);
 
+    // for Keyboard
     const [isUserTyping, setIsUserTyping] = useState(false);
+    const [isKeyboardActive, setIsKeyboardActive] = useState(true);
+
     const [cursorPos, setCursorPos] = useState(0);
     const [words, setWords] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -489,7 +490,12 @@ function App() {
                         <div className="result">Accuracy: {score.accuracy}%</div>
                     </div>
                 ) : (
-                    <Keyboard isUserTyping={isUserTyping} />
+                    <Keyboard
+                        isUserTyping={isUserTyping}
+                        isKeyboardActive={isKeyboardActive}
+                        showKeyboardContainer={showKeyboardContainer}
+                        showTextContainer={showTextContainer}
+                    />
                 )}
             </div>
         </>
@@ -529,8 +535,6 @@ localText.sort(() => Math.random() - 0.5);
 
 createRoot(document.getElementById("root")).render(
     <StrictMode>
-        <DataProvider>
             <App />
-        </DataProvider>
     </StrictMode>
 );
