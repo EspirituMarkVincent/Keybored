@@ -1,5 +1,4 @@
 import { useRef, useEffect, useState, memo, useCallback } from "react";
-import "./Text_field.css";
 
 const Word = memo(function Word({
     word,
@@ -20,7 +19,9 @@ const Word = memo(function Word({
                 const char = i >= word.length ? typed[i] : word[i];
                 let className = "letter ";
 
+                // Highlighting logic is removed. The rest of the styling remains.
                 if (typed === "") {
+                    // Future word, no styling.
                 } else if (i >= word.length) {
                     className += "excess";
                 } else if (isCurrent) {
@@ -34,6 +35,7 @@ const Word = memo(function Word({
                 return (
                     <span
                         key={i}
+                        // This ref is crucial for positioning the new smooth cursor.
                         ref={(el) => (isCurrent && i === cursorPos ? registerLetter(el) : null)}
                         className={className}
                     >

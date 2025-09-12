@@ -1,10 +1,61 @@
-import useSettings from "../../hooks/useSettings";
-import "./Settings.css";
+import React, { useState } from "react";
 
 const SettingsUI = ({ isOpen, onClose }) => {
-    const { settings, toggleSetting, updateSetting, resetToDefaults } = useSettings();
+    const [settings, setSettings] = useState({
+        keyboard: {
+            visible: true,
+            container: true,
+            highlightKeys: true,
+        },
+        text: {
+            container: true,
+            fontSize: "medium",
+            lineHeight: "normal",
+        },
+        input: {
+            visible: false,
+            autoFocus: true,
+        },
+        theme: {
+            mode: "light",
+            colorScheme: "default",
+        },
+        game: {
+            showWPM: true,
+            showAccuracy: true,
+            soundEffects: false,
+        },
+    });
 
-    if (!isOpen) return null;
+    const toggleSetting = (category, key) => {
+        setSettings((prev) => ({
+            ...prev,
+            [category]: {
+                ...prev[category],
+                [key]: !prev[category][key],
+            },
+        }));
+    };
+
+    const updateSetting = (category, key, value) => {
+        setSettings((prev) => ({
+            ...prev,
+            [category]: {
+                ...prev[category],
+                [key]: value,
+            },
+        }));
+    };
+
+    const resetToDefaults = () => {
+        setSettings({
+            keyboard: { visible: true, container: true, highlightKeys: true },
+            text: { container: true, fontSize: "medium", lineHeight: "normal" },
+            input: { visible: false, autoFocus: true },
+            theme: { mode: "light", colorScheme: "default" },
+            game: { showWPM: true, showAccuracy: true, soundEffects: false },
+        });
+    };
 
     const ToggleSwitch = ({ isOn, onToggle, disabled = false }) => (
         <button
@@ -56,6 +107,8 @@ const SettingsUI = ({ isOpen, onClose }) => {
         </div>
     );
 
+    if (!isOpen) return null;
+
     return (
         <>
             <div className="settings-overlay" onClick={onClose} />
@@ -73,7 +126,7 @@ const SettingsUI = ({ isOpen, onClose }) => {
                 </div>
 
                 <div className="settings-content">
-                    <SettingSection title="Keyboard" icon="⌨">
+                    <SettingSection title="Keyboard" icon="⌨️">
                         <SettingRow
                             label="Show Keyboard"
                             description="Display the visual keyboard below the text"
@@ -83,6 +136,7 @@ const SettingsUI = ({ isOpen, onClose }) => {
                                 onToggle={() => toggleSetting("keyboard", "visible")}
                             />
                         </SettingRow>
+
                         <SettingRow
                             label="Keyboard Container"
                             description="Show background and border around keyboard"
@@ -93,6 +147,7 @@ const SettingsUI = ({ isOpen, onClose }) => {
                                 disabled={!settings.keyboard.visible}
                             />
                         </SettingRow>
+
                         <SettingRow
                             label="Highlight Keys"
                             description="Highlight keys as you type them"
@@ -115,6 +170,7 @@ const SettingsUI = ({ isOpen, onClose }) => {
                                 onToggle={() => toggleSetting("text", "container")}
                             />
                         </SettingRow>
+
                         <SettingRow
                             label="Font Size"
                             description="Adjust the size of the typing text"
@@ -130,6 +186,7 @@ const SettingsUI = ({ isOpen, onClose }) => {
                                 label="Font Size"
                             />
                         </SettingRow>
+
                         <SettingRow label="Line Height" description="Spacing between lines of text">
                             <SelectDropdown
                                 value={settings.text.lineHeight}
@@ -144,7 +201,7 @@ const SettingsUI = ({ isOpen, onClose }) => {
                         </SettingRow>
                     </SettingSection>
 
-                    <SettingSection title="Input Field" icon="📥">
+                    <SettingSection title="Input Field" icon="'📥'">
                         <SettingRow
                             label="Show Input Field"
                             description="Display the input field below text"
@@ -154,6 +211,7 @@ const SettingsUI = ({ isOpen, onClose }) => {
                                 onToggle={() => toggleSetting("input", "visible")}
                             />
                         </SettingRow>
+
                         <SettingRow
                             label="Auto Focus"
                             description="Automatically focus input when page loads"
@@ -199,13 +257,14 @@ const SettingsUI = ({ isOpen, onClose }) => {
                         </SettingRow>
                     </SettingSection>
 
-                    <SettingSection title="Game Features" icon="🎯">
+                    <SettingSection title="Game Features" icon="🎮">
                         <SettingRow label="Show WPM" description="Display words per minute counter">
                             <ToggleSwitch
                                 isOn={settings.game.showWPM}
                                 onToggle={() => toggleSetting("game", "showWPM")}
                             />
                         </SettingRow>
+
                         <SettingRow
                             label="Show Accuracy"
                             description="Display typing accuracy percentage"
@@ -215,6 +274,7 @@ const SettingsUI = ({ isOpen, onClose }) => {
                                 onToggle={() => toggleSetting("game", "showAccuracy")}
                             />
                         </SettingRow>
+
                         <SettingRow
                             label="Sound Effects"
                             description="Play sounds for typing feedback"

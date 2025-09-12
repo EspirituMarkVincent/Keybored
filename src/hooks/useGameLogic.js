@@ -1,4 +1,5 @@
-import { useState, useEffect, useRef} from "react";
+// src/hooks/useGameLogic.js
+import { useState, useRef, useEffect, useCallback } from "react";
 
 export default function useGameLogic() {
     const [cursorPos, setCursorPos] = useState(0);
@@ -18,6 +19,7 @@ export default function useGameLogic() {
     const [isFinished, setIsFinished] = useState(false);
     const [timer, setTimer] = useState(gameModeSettings.timeGoal);
     const timerRef = useRef(null);
+    const [isUserTyping, setIsUserTyping] = useState(false);
 
     const [score, setScore] = useState({
         letterScore: 0,
@@ -32,16 +34,20 @@ export default function useGameLogic() {
         typedHistory: {},
     });
 
-    const getText = () => {
+    const getText = useCallback(() => {
         setLoading(true);
         fetch("https://random-word-api.vercel.app/api?words=500")
             .then((r) => r.json())
-            .then((data) => setWords(data))
-            .catch(() => setWords(localText))
+            .then((data) => {
+                setWords(data);
+            })
+            .catch(() => {
+                setWords(localText);
+            })
             .finally(() => setLoading(false));
-    };
+    }, []);
 
-    const resetEverything = () => {
+    const resetEverything = useCallback(() => {
         clearInterval(timerRef.current);
         setInput("");
         setCursorPos(0);
@@ -50,30 +56,31 @@ export default function useGameLogic() {
         setIsStarted(false);
         setIsFinished(false);
         setTimer(gameModeSettings.mode === "time" ? gameModeSettings.timeGoal : 0);
-        setScore({ letterScore: 0, totalLetters: 0, standardWPM: 0, accuracy: 0 });
+        setScore({
+            letterScore: 0,
+            totalLetters: 0,
+            standardWPM: 0,
+            accuracy: 0,
+        });
         inputRef.current?.focus();
-    };
+    }, [gameModeSettings]);
 
-    const restartText = () => {
+    const restartText = useCallback(() => {
         getText();
         resetEverything();
-    };
+    }, [getText, resetEverything]);
 
-
-    const calculateScore = () => {
+    const calculateScore = useCallback(() => {
         let totalCorrect = 0;
         let totalTyped = 0;
-
         Object.entries(typedHistory).forEach(([index, typedWord]) => {
             const correctWord = words[parseInt(index)];
             if (!correctWord) return;
-
             for (let i = 0; i < Math.min(typedWord.length, correctWord.length); i++) {
                 if (typedWord[i] === correctWord[i]) {
                     totalCorrect++;
                 }
             }
-
             totalTyped += typedWord.length;
             if (typedWord.length < correctWord.length) {
                 totalTyped += correctWord.length - typedWord.length;
@@ -89,11 +96,10 @@ export default function useGameLogic() {
             }
             totalTyped += input.length;
         }
-
         return { totalCorrect, totalTyped };
-    };
+    }, [words, wordIndex, typedHistory, input]);
 
-    const startTimer = () => {
+    const startTimer = useCallback(() => {
         setIsStarted(true);
         timerRef.current = setInterval(() => {
             setTimer((prev) => {
@@ -108,63 +114,62 @@ export default function useGameLogic() {
                 return prev + 1;
             });
         }, 1000);
-    };
+    }, [gameModeSettings.mode]);
 
-    const handleInputChange = (e) => {
-        if (isFinished) return;
-        if (!isStarted) startTimer();
-        setInput(e.target.value);
-    };
+    const handleInputChange = useCallback(
+        (e) => {
+            if (isFinished) return;
+            if (!isStarted) startTimer();
+            setInput(e.target.value);
+        },
+        [isFinished, isStarted, startTimer]
+    );
 
-    const handleKeyDown = (e) => {
-        if (e.key === "Enter") {
-            resetEverything();
-        } else if (e.key === "Tab") {
-            e.preventDefault();
-            restartText();
-        } else if (e.key === " ") {
-            e.preventDefault();
-            const trimmedInput = input.trim();
-            const currentWord = words[wordIndex] || "";
-
-            const skippedWord = trimmedInput === "" ? "_".repeat(currentWord.length) : trimmedInput;
-
-            setTypedHistory((prev) => ({
-                ...prev,
-                [wordIndex]: skippedWord,
-            }));
-
-            setWordIndex((prev) => prev + 1);
-            setInput("");
-            setCursorPos(0);
-        } else if (e.key === "Backspace" && input === "" && wordIndex > 0) {
-            e.preventDefault();
-            const newWordIndex = wordIndex - 1;
-            const newTypedHistory = { ...typedHistory };
-            const prevWord = newTypedHistory[newWordIndex];
-
-            delete newTypedHistory[newWordIndex];
-
-            setWordIndex(newWordIndex);
-            setInput(prevWord);
-            setTypedHistory(newTypedHistory);
-            setCursorPos(prevWord.length);
-        }
-    };
+    const handleKeyDown = useCallback(
+        (e) => {
+            if (e.key === "Enter") {
+                resetEverything();
+            } else if (e.key === "Tab") {
+                restartText();
+            } else if (e.key === " ") {
+                e.preventDefault();
+                const trimmedInput = input.trim();
+                const currentWord = words[wordIndex] || "";
+                const skippedWord =
+                    trimmedInput === "" ? "_".repeat(currentWord.length) : trimmedInput;
+                setTypedHistory((prev) => ({
+                    ...prev,
+                    [wordIndex]: skippedWord,
+                }));
+                setWordIndex((prev) => prev + 1);
+                setInput("");
+                setCursorPos(0);
+            } else if (e.key === "Backspace" && input === "" && wordIndex > 0) {
+                e.preventDefault();
+                const newWordIndex = wordIndex - 1;
+                const newTypedHistory = { ...typedHistory };
+                const prevWord = newTypedHistory[newWordIndex];
+                delete newTypedHistory[newWordIndex];
+                setWordIndex(newWordIndex);
+                setInput(prevWord);
+                setTypedHistory(newTypedHistory);
+                setCursorPos(prevWord.length);
+            }
+        },
+        [input, wordIndex, words, typedHistory, resetEverything, restartText]
+    );
 
     useEffect(() => {
         getText();
-
-        const handleKeyDown = (e) => {
+        const handleTabKey = (e) => {
             if (e.key === "Tab") {
                 e.preventDefault();
                 resetEverything();
             }
         };
-
-        window.addEventListener("keydown", handleKeyDown);
-        return () => window.removeEventListener("keydown", handleKeyDown);
-    }, []);
+        window.addEventListener("keydown", handleTabKey);
+        return () => window.removeEventListener("keydown", handleTabKey);
+    }, [getText, resetEverything]);
 
     useEffect(() => {
         const handleSelectionChange = () => {
@@ -177,26 +182,14 @@ export default function useGameLogic() {
     }, []);
 
     useEffect(() => {
-        const handleGlobalKeyDown = () => {
-            inputRef.current?.focus();
-        };
-        window.addEventListener("keydown", handleGlobalKeyDown);
-        return () => window.removeEventListener("keydown", handleGlobalKeyDown);
-    }, []);
-
-    useEffect(() => {
         resetEverything();
-    }, [gameModeSettings]);
-
-    useEffect(() => () => clearInterval(timerRef.current), []);
+    }, [gameModeSettings, resetEverything]);
 
     useEffect(() => {
         if (!isStarted) return;
         const { totalCorrect, totalTyped } = calculateScore();
-
         const elapsed =
             gameModeSettings.mode === "time" ? gameModeSettings.timeGoal - timer : timer;
-
         if (elapsed > 0 && totalTyped > 0) {
             const wpm = Math.round(totalCorrect / 5 / (elapsed / 60));
             const acc = Math.round((totalCorrect / totalTyped) * 100);
@@ -206,26 +199,18 @@ export default function useGameLogic() {
                 standardWPM: wpm,
                 accuracy: acc,
             });
-        } else {
-            setScore((prev) => ({
-                ...prev,
-                letterScore: totalCorrect,
-                totalLetters: totalTyped,
-                standardWPM: 0,
-                accuracy: totalTyped > 0 ? Math.round((totalCorrect / totalTyped) * 100) : 0,
-            }));
         }
-    }, [timer, typedHistory, wordIndex, isStarted, gameModeSettings, words]);
+    }, [timer, typedHistory, isStarted, gameModeSettings, words, calculateScore]);
 
     useEffect(() => {
         if (isFinished && score.standardWPM > 0) {
             setResult({
                 wpm: score.standardWPM,
                 accuracy: score.accuracy,
-                typedHistory,
+                typedHistory: typedHistory,
             });
         }
-    }, [isFinished]);
+    }, [isFinished, score, typedHistory]);
 
     useEffect(() => {
         if (gameModeSettings.mode === "words" && wordIndex >= gameModeSettings.wordGoal) {
@@ -234,33 +219,22 @@ export default function useGameLogic() {
         }
     }, [wordIndex, gameModeSettings]);
 
-    // debugging
-    useEffect(() => {
-        console.log(score);
-    }, [score]);
-
     return {
         cursorPos,
-        setCursorPos,
         words,
         loading,
         gameModeSettings,
         setGameModeSettings,
         input,
-        setInput,
         inputRef,
         wordIndex,
-        setWordIndex,
         typedHistory,
-        setTypedHistory,
-        isStarted,
-        setIsStarted,
         isFinished,
-        setIsFinished,
         timer,
         score,
-        setScore,
         result,
+        isUserTyping,
+        setIsUserTyping,
         resetEverything,
         restartText,
         handleInputChange,

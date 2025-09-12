@@ -1,6 +1,4 @@
 import { useEffect, useState } from "react";
-import useSettings from "../../hooks/useSettings";
-import "./Keyboard.css";
 
 const keyData = {
     Escape: { label: "Esc", size: "60px" },
@@ -83,10 +81,12 @@ const rows = [
     ],
 ];
 
-// Removed props for keyboard visibility and container
-export default function Keyboard({ isUserTyping = true }) {
-    // Access settings directly from the hook
-    const { settings } = useSettings();
+export default function Keyboard({
+    isUserTyping = true,
+    isKeyboardActive = true,
+    showKeyboardContainer = true,
+    onlyLetters = false,
+}) {
     const [pressedKey, setPressedKey] = useState({});
     const [isShiftPressed, setIsShiftPressed] = useState(false);
     const [isCapsLockOn, setIsCapsLockOn] = useState(false);
@@ -143,15 +143,17 @@ export default function Keyboard({ isUserTyping = true }) {
     };
 
     const isKeyHighlighted = (key) => {
-        if (!isUserTyping || !settings.keyboard.highlightKeys) return false;
+        if (!isUserTyping) return false;
 
         const data = keyData[key];
         if (!data) return false;
 
+        // Check if the specific physical key is pressed.
         if (pressedKey[key]) {
             return true;
         }
 
+        // For letter and number keys, check for their physical key codes.
         if (data.shifted) {
             const letterCode = `Key${key.toUpperCase()}`;
             const digitCode = `Digit${key}`;
@@ -161,14 +163,20 @@ export default function Keyboard({ isUserTyping = true }) {
         return false;
     };
 
+    const hideObject = {
+        position: "absolute",
+        opacity: 0,
+        pointerEvents: "none",
+        height: 0,
+        width: 0,
+    };
+
     return (
         <>
             <div
-                // Now using settings.keyboard.visible directly
-                className={`grid-board ${settings.keyboard.visible ? "" : "hidden"}`}
+                className={`grid-board ${isKeyboardActive ? "" : "hidden"}`}
                 style={{
-                    // Now using settings.keyboard.container directly
-                    ...(settings.keyboard.container
+                    ...(showKeyboardContainer
                         ? {}
                         : { background: "none", boxShadow: "none", border: "none" }),
                 }}
