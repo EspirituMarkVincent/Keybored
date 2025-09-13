@@ -1,61 +1,14 @@
-import React, { useState } from "react";
+import React from "react";
+import { useSettings } from "../contexts/SettingsContext";
 
 const SettingsUI = ({ isOpen, onClose }) => {
-    const [settings, setSettings] = useState({
-        keyboard: {
-            visible: true,
-            container: true,
-            highlightKeys: true,
-        },
-        text: {
-            container: true,
-            fontSize: "medium",
-            lineHeight: "normal",
-        },
-        input: {
-            visible: false,
-            autoFocus: true,
-        },
-        theme: {
-            mode: "light",
-            colorScheme: "default",
-        },
-        game: {
-            showWPM: true,
-            showAccuracy: true,
-            soundEffects: false,
-        },
-    });
-
-    const toggleSetting = (category, key) => {
-        setSettings((prev) => ({
-            ...prev,
-            [category]: {
-                ...prev[category],
-                [key]: !prev[category][key],
-            },
-        }));
-    };
-
-    const updateSetting = (category, key, value) => {
-        setSettings((prev) => ({
-            ...prev,
-            [category]: {
-                ...prev[category],
-                [key]: value,
-            },
-        }));
-    };
-
-    const resetToDefaults = () => {
-        setSettings({
-            keyboard: { visible: true, container: true, highlightKeys: true },
-            text: { container: true, fontSize: "medium", lineHeight: "normal" },
-            input: { visible: false, autoFocus: true },
-            theme: { mode: "light", colorScheme: "default" },
-            game: { showWPM: true, showAccuracy: true, soundEffects: false },
-        });
-    };
+    // Use the useSettings hook to get settings and control functions
+    const {
+        settings,
+        toggleSetting,
+        updateSetting,
+        resetToDefaults,
+    } = useSettings();
 
     const ToggleSwitch = ({ isOn, onToggle, disabled = false }) => (
         <button

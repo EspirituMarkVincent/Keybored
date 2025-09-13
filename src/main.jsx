@@ -4,6 +4,7 @@ import Keyboard from "./components/Keyboard";
 import TextField from "./components/Text_field";
 import SettingsUI from "./components/Settings";
 import { GameProvider, useGame } from "./contexts/GameContext";
+import { SettingsProvider, useSettings } from "./contexts/SettingsContext";
 import "./styles/main.css";
 import "./styles/Keyboard.css";
 import "./styles/Settings.css";
@@ -30,17 +31,25 @@ function AppContent() {
         handleKeyDown,
     } = useGame();
 
-    const [darkMode, setDarkMode] = useState(false);
-    const [isKeyboardActive, setIsKeyboardActive] = useState(true);
-    const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-    const [showKeyboardContainer, setShowKeyboardContainer] = useState(true);
-    const [showTextContainer, setShowTextContainer] = useState(true);
-    const [showInputField, setShowInputField] = useState(false);
+    // Use settings from context
+    const {
+        keyboardVisible,
+        keyboardContainer,
+        keyboardHighlight,
+        textContainer,
+        inputVisible,
+        inputAutoFocus,
+        isDarkMode,
+    } = useSettings();
 
+    // Remove local state that is now managed by SettingsContext
+    const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+    
+    // Update useEffect to use the isDarkMode value from context
     useEffect(() => {
-        if (darkMode) document.body.classList.add("dark-mode");
+        if (isDarkMode) document.body.classList.add("dark-mode");
         else document.body.classList.remove("dark-mode");
-    }, [darkMode]);
+    }, [isDarkMode]);
 
     useEffect(() => {
         const forceFocus = () => {
@@ -61,13 +70,13 @@ function AppContent() {
                 <div className="divider"></div>
                 <button
                     className="theme-toggle-btn header-btn"
-                    onClick={() => setDarkMode((prev) => !prev)}
+                    onClick={() => {}} // Theme is now controlled by SettingsUI
                 >
-                    {darkMode ? "🌒" : "🌙"}
+                    {isDarkMode ? "🌒" : "🌙"}
                 </button>
                 <button
                     className="keyboard-toggle-btn header-btn"
-                    onClick={() => setIsKeyboardActive((prev) => !prev)}
+                    onClick={() => {}} // Keyboard visibility is now controlled by SettingsUI
                 >
                     ⌨️
                 </button>
@@ -138,12 +147,12 @@ function AppContent() {
                     userInput={input}
                     typedHistory={typedHistory}
                     cursorPos={cursorPos}
-                    showTextContainer={showTextContainer}
+                    showTextContainer={textContainer}
                 />
 
                 <div className="form-group">
                     <input
-                        className={`input-field ${showInputField ? "hidden" : ""}`}
+                        className={`input-field ${inputVisible ? "hidden" : ""}`}
                         type="text"
                         value={input}
                         ref={inputRef}
@@ -151,7 +160,7 @@ function AppContent() {
                         disabled={isFinished}
                         onFocus={() => setIsUserTyping(true)}
                         onBlur={() => setIsUserTyping(false)}
-                        autoFocus
+                        autoFocus={inputAutoFocus}
                         onKeyDown={(e) => {
                             if (
                                 [
@@ -202,8 +211,8 @@ function AppContent() {
                 ) : (
                     <Keyboard
                         isUserTyping={isUserTyping}
-                        isKeyboardActive={isKeyboardActive}
-                        showKeyboardContainer={showKeyboardContainer}
+                        isKeyboardActive={keyboardVisible}
+                        showKeyboardContainer={keyboardContainer}
                     />
                 )}
             </div>
@@ -213,8 +222,10 @@ function AppContent() {
 
 createRoot(document.getElementById("root")).render(
     <StrictMode>
-        <GameProvider>
-            <AppContent />
-        </GameProvider>
+        <SettingsProvider>
+            <GameProvider>
+                <AppContent/>
+            </GameProvider>
+        </SettingsProvider>
     </StrictMode>
 );

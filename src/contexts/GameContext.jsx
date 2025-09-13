@@ -214,6 +214,24 @@ export function GameProvider({ children }) {
         }
     }, [wordIndex, gameModeSettings]);
 
+    //save the score on finish
+    useEffect(() => {
+        if (isFinished) {
+            const existingScores = JSON.parse(localStorage.getItem('typing-game-scores')) || [];
+
+            const newScore = {
+                wpm: score.standardWPM,
+                accuracy: score.accuracy,
+                date: new Date().toISOString(),
+                mode: gameModeSettings.mode,
+                goal: gameModeSettings.mode === "time" ? gameModeSettings.timeGoal : gameModeSettings.wordGoal,
+            };
+
+            const updatedScores = [...existingScores, newScore];
+            localStorage.setItem('typing-game-scores', JSON.stringify(updatedScores));
+        }
+    }, [isFinished, score, gameModeSettings]);
+
     // debugging
     useEffect(() => {
         console.log("score", score);
