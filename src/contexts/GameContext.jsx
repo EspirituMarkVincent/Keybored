@@ -1,7 +1,9 @@
-// src/hooks/useGameLogic.js
-import { useState, useRef, useEffect, useCallback } from "react";
+import { createContext, useContext, useState, useRef, useEffect, useCallback } from "react";
 
-export default function useGameLogic() {
+// Create context
+const GameContext = createContext(null);
+
+export function GameProvider({ children }) {
     const [cursorPos, setCursorPos] = useState(0);
     const [words, setWords] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -34,15 +36,31 @@ export default function useGameLogic() {
         typedHistory: {},
     });
 
+    // prettier-ignore
+    const localText = [
+        "apple","ape","axiom","amber","aroma","braid","baker","banks","barge","bases",
+        "cable","cache","cakes","calls","camps","dance","darts","dates","dawns","deals",
+        "eagle","eases","eaten","edges","eject","flute","fable","fancy","fence","finds",
+        "glide","gnome","graft","grain","grape","honey","hound","house","haste","haven",
+        "igloo","icy","image","inch","index","jelly","jade","jaguar","jawed","jests",
+        "kite","knot","knead","knell","knock","lance","lark","laser","latch","lauds",
+        "mango","mere","mesh","mice","might","nerve","nest","night","nile","ninth",
+        "ocean","oath","olive","omen","onion","pulse","pain","paint","pales","pants",
+        "queen","quake","quark","quay","quest","ranch","rave","raven","rays","reach",
+        "sage","sail","sake","sale","says","tiger","tale","tame","tape","task",
+        "umpire","used","user","utah","utopia","vase","vast","vial","vice","view",
+        "wagon","wail","wane","warp","wash","xray","xylem","xylo","xyris","xyst",
+        "yacht","yale","yard","yarn","yeast","zest","zing","zion","zips","zones"
+    ];
+
     const getText = useCallback(() => {
         setLoading(true);
-        fetch("https://random-word-api.vercel.app/api?words=500")
+        fetch("1https://random-word-api.vercel.app/api?words=500")
             .then((r) => r.json())
-            .then((data) => {
-                setWords(data);
-            })
+            .then((data) => setWords(data))
             .catch(() => {
-                setWords(localText);
+                const shuffled = [...localText].sort(() => Math.random() - 0.5);
+                setWords(shuffled);
             })
             .finally(() => setLoading(false));
     }, []);
@@ -56,12 +74,7 @@ export default function useGameLogic() {
         setIsStarted(false);
         setIsFinished(false);
         setTimer(gameModeSettings.mode === "time" ? gameModeSettings.timeGoal : 0);
-        setScore({
-            letterScore: 0,
-            totalLetters: 0,
-            standardWPM: 0,
-            accuracy: 0,
-        });
+        setScore({ letterScore: 0, totalLetters: 0, standardWPM: 0, accuracy: 0 });
         inputRef.current?.focus();
     }, [gameModeSettings]);
 
@@ -77,22 +90,16 @@ export default function useGameLogic() {
             const correctWord = words[parseInt(index)];
             if (!correctWord) return;
             for (let i = 0; i < Math.min(typedWord.length, correctWord.length); i++) {
-                if (typedWord[i] === correctWord[i]) {
-                    totalCorrect++;
-                }
+                if (typedWord[i] === correctWord[i]) totalCorrect++;
             }
             totalTyped += typedWord.length;
-            if (typedWord.length < correctWord.length) {
+            if (typedWord.length < correctWord.length)
                 totalTyped += correctWord.length - typedWord.length;
-            }
         });
-
         if (words[wordIndex]) {
             const currentWord = words[wordIndex];
             for (let i = 0; i < Math.min(input.length, currentWord.length); i++) {
-                if (input[i] === currentWord[i]) {
-                    totalCorrect++;
-                }
+                if (input[i] === currentWord[i]) totalCorrect++;
             }
             totalTyped += input.length;
         }
@@ -127,20 +134,15 @@ export default function useGameLogic() {
 
     const handleKeyDown = useCallback(
         (e) => {
-            if (e.key === "Enter") {
-                resetEverything();
-            } else if (e.key === "Tab") {
-                restartText();
-            } else if (e.key === " ") {
+            if (e.key === "Enter") resetEverything();
+            else if (e.key === "Tab") restartText();
+            else if (e.key === " ") {
                 e.preventDefault();
                 const trimmedInput = input.trim();
                 const currentWord = words[wordIndex] || "";
                 const skippedWord =
                     trimmedInput === "" ? "_".repeat(currentWord.length) : trimmedInput;
-                setTypedHistory((prev) => ({
-                    ...prev,
-                    [wordIndex]: skippedWord,
-                }));
+                setTypedHistory((prev) => ({ ...prev, [wordIndex]: skippedWord }));
                 setWordIndex((prev) => prev + 1);
                 setInput("");
                 setCursorPos(0);
@@ -151,9 +153,10 @@ export default function useGameLogic() {
                 const prevWord = newTypedHistory[newWordIndex];
                 delete newTypedHistory[newWordIndex];
                 setWordIndex(newWordIndex);
-                setInput(prevWord);
+                const cleanedPrevWord = prevWord && prevWord.match(/^_+$/) ? "" : prevWord;
+                setInput(cleanedPrevWord);
                 setTypedHistory(newTypedHistory);
-                setCursorPos(prevWord.length);
+                setCursorPos(cleanedPrevWord.length);
             }
         },
         [input, wordIndex, words, typedHistory, resetEverything, restartText]
@@ -173,17 +176,14 @@ export default function useGameLogic() {
 
     useEffect(() => {
         const handleSelectionChange = () => {
-            if (document.activeElement === inputRef.current) {
+            if (document.activeElement === inputRef.current)
                 setCursorPos(inputRef.current.selectionStart);
-            }
         };
         document.addEventListener("selectionchange", handleSelectionChange);
         return () => document.removeEventListener("selectionchange", handleSelectionChange);
     }, []);
 
-    useEffect(() => {
-        resetEverything();
-    }, [gameModeSettings, resetEverything]);
+    useEffect(() => resetEverything(), [gameModeSettings, resetEverything]);
 
     useEffect(() => {
         if (!isStarted) return;
@@ -203,13 +203,8 @@ export default function useGameLogic() {
     }, [timer, typedHistory, isStarted, gameModeSettings, words, calculateScore]);
 
     useEffect(() => {
-        if (isFinished && score.standardWPM > 0) {
-            setResult({
-                wpm: score.standardWPM,
-                accuracy: score.accuracy,
-                typedHistory: typedHistory,
-            });
-        }
+        if (isFinished && score.standardWPM > 0)
+            setResult({ wpm: score.standardWPM, accuracy: score.accuracy, typedHistory });
     }, [isFinished, score, typedHistory]);
 
     useEffect(() => {
@@ -219,56 +214,43 @@ export default function useGameLogic() {
         }
     }, [wordIndex, gameModeSettings]);
 
-    return {
-        cursorPos,
-        words,
-        loading,
-        gameModeSettings,
-        setGameModeSettings,
-        input,
-        inputRef,
-        wordIndex,
-        typedHistory,
-        isFinished,
-        timer,
-        score,
-        result,
-        isUserTyping,
-        setIsUserTyping,
-        resetEverything,
-        restartText,
-        handleInputChange,
-        handleKeyDown,
-    };
+    // debugging
+    useEffect(() => {
+        console.log("score", score);
+    }, [score]);
+
+    return (
+        <GameContext.Provider
+            value={{
+                cursorPos,
+                words,
+                loading,
+                gameModeSettings,
+                setGameModeSettings,
+                input,
+                inputRef,
+                wordIndex,
+                typedHistory,
+                isFinished,
+                timer,
+                score,
+                result,
+                isUserTyping,
+                setIsUserTyping,
+                resetEverything,
+                restartText,
+                handleInputChange,
+                handleKeyDown,
+            }}
+        >
+            {children}
+        </GameContext.Provider>
+    );
 }
 
-// prettier-ignore
-const localText = [
-    "apple", "ape", "axiom", "amber", "aroma",
-    "braid", "baker", "banks", "barge", "bases",
-    "cable", "cache", "cakes", "calls", "camps",
-    "dance", "darts", "dates", "dawns", "deals",
-    "eagle", "eases", "eaten", "edges", "eject",
-    "flute", "fable", "fancy", "fence", "finds",
-    "glide", "gnome", "graft", "grain", "grape",
-    "honey", "hound", "house", "haste", "haven",
-    "igloo", "icy", "image", "inch", "index",
-    "jelly", "jade", "jaguar", "jawed", "jests",
-    "kite", "knot", "knead", "knell", "knock",
-    "lance", "lark", "laser", "latch", "lauds",
-    "mango", "mere", "mesh", "mice", "might",
-    "nerve", "nest", "night", "nile", "ninth",
-    "ocean", "oath", "olive", "omen", "onion",
-    "pulse", "pain", "paint", "pales", "pants",
-    "queen", "quake", "quark", "quay", "quest",
-    "ranch", "rave", "raven", "rays", "reach",
-    "sage", "sail", "sake", "sale", "says",
-    "tiger", "tale", "tame", "tape", "task",
-    "umpire", "used", "user", "utah", "utopia",
-    "vase", "vast", "vial", "vice", "view",
-    "wagon", "wail", "wane", "warp", "wash",
-    "xray", "xylem", "xylo", "xyris", "xyst",
-    "yacht", "yale", "yard", "yarn", "yeast",
-    "zest", "zing", "zion", "zips", "zones",
-];
-localText.sort(() => Math.random() - 0.5);
+// Hook to consume the context
+export const useGame = () => {
+    const context = useContext(GameContext);
+    if (!context) throw new Error("useGame must be used within a GameProvider");
+    return context;
+};

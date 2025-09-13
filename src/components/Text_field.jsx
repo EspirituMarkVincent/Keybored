@@ -1,4 +1,5 @@
 import { useRef, useEffect, useState, memo, useCallback } from "react";
+import { useGame } from "../contexts/GameContext";
 
 const Word = memo(function Word({
     word,
@@ -19,7 +20,6 @@ const Word = memo(function Word({
                 const char = i >= word.length ? typed[i] : word[i];
                 let className = "letter ";
 
-                // Highlighting logic is removed. The rest of the styling remains.
                 if (typed === "") {
                     // Future word, no styling.
                 } else if (i >= word.length) {
@@ -35,7 +35,6 @@ const Word = memo(function Word({
                 return (
                     <span
                         key={i}
-                        // This ref is crucial for positioning the new smooth cursor.
                         ref={(el) => (isCurrent && i === cursorPos ? registerLetter(el) : null)}
                         className={className}
                     >
@@ -54,14 +53,15 @@ const Word = memo(function Word({
     );
 });
 
-export default function TextField({
-    words,
-    currentWordIndex,
-    userInput,
-    typedHistory,
-    cursorPos,
-    showTextContainer = true,
-}) {
+export default function TextField({ showTextContainer = true }) {
+    const {
+        words,
+        wordIndex: currentWordIndex,
+        input: userInput,
+        typedHistory,
+        cursorPos,
+    } = useGame();
+
     const cursorRef = useRef(null);
     const wordRefs = useRef({});
     const textContainerRef = useRef(null);
@@ -104,7 +104,6 @@ export default function TextField({
         if (activeLetterEl) {
             const top = activeLetterEl.offsetTop;
             const left = activeLetterEl.offsetLeft;
-
             const letterRect = activeLetterEl.getBoundingClientRect();
 
             setCursorStyle({
@@ -116,7 +115,7 @@ export default function TextField({
         }
     }, [currentWordIndex, cursorPos, userInput, words, lineNumbers]);
 
-    // Handles auto-scrolling to keep the cursor in view.
+    // Auto-scroll cursor into view
     useEffect(() => {
         cursorRef.current?.scrollIntoView({
             block: "center",
