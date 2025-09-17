@@ -55,7 +55,7 @@ export function GameProvider({ children }) {
 
     const getText = useCallback(() => {
         setLoading(true);
-        fetch("1https://random-word-api.vercel.app/api?words=500")
+        fetch("https://random-word-api.vercel.app/api?words=500")
             .then((r) => r.json())
             .then((data) => setWords(data))
             .catch(() => {

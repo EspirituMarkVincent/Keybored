@@ -1,4 +1,4 @@
-import React from "react";
+ import React from "react";
 import { useSettings } from "../contexts/SettingsContext";
 
 const SettingsUI = ({ isOpen, onClose }) => {
@@ -79,6 +79,10 @@ const SettingsUI = ({ isOpen, onClose }) => {
                 </div>
 
                 <div className="settings-content">
+                    <SettingSection title="Compact Mode" icon="🤏">
+                        
+                    </SettingSection>
+
                     <SettingSection title="Keyboard" icon="⌨️">
                         <SettingRow
                             label="Show Keyboard"
@@ -121,35 +125,6 @@ const SettingsUI = ({ isOpen, onClose }) => {
                             <ToggleSwitch
                                 isOn={settings.text.container}
                                 onToggle={() => toggleSetting("text", "container")}
-                            />
-                        </SettingRow>
-
-                        <SettingRow
-                            label="Font Size"
-                            description="Adjust the size of the typing text"
-                        >
-                            <SelectDropdown
-                                value={settings.text.fontSize}
-                                options={[
-                                    { value: "small", label: "Small" },
-                                    { value: "medium", label: "Medium" },
-                                    { value: "large", label: "Large" },
-                                ]}
-                                onChange={(value) => updateSetting("text", "fontSize", value)}
-                                label="Font Size"
-                            />
-                        </SettingRow>
-
-                        <SettingRow label="Line Height" description="Spacing between lines of text">
-                            <SelectDropdown
-                                value={settings.text.lineHeight}
-                                options={[
-                                    { value: "compact", label: "Compact" },
-                                    { value: "normal", label: "Normal" },
-                                    { value: "relaxed", label: "Relaxed" },
-                                ]}
-                                onChange={(value) => updateSetting("text", "lineHeight", value)}
-                                label="Line Height"
                             />
                         </SettingRow>
                     </SettingSection>

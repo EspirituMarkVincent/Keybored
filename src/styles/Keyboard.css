@@ -6,8 +6,7 @@
     padding: 20px;
     background-color: var(--bg-secondary);
     border-radius: 12px;
-    border: 1px solid var(--border-color);
-    box-shadow: 0 4px 12px var(--shadow);
+    border: none;
     transition: all 0.3s ease;
 }
 
@@ -29,19 +28,17 @@
     height: 60px;
     font-size: 18px;
     font-weight: 500;
-    border: 1px solid var(--border-color);
+    border: none;
     margin: 2px;
     align-items: center;
     justify-content: center;
     outline: none;
     font-family: "Poppins", sans-serif;
     transition: all 0.2s ease;
-    box-shadow: 0 1px 3px var(--key-shadow);
 }
 
 .grid-key.pressed {
-    background-color: var(--highlight-bg);
-    border-color: var(--border-hover);
+    background-color: var(--button-hover);
     transform: translateY(1px);
     box-shadow: none;
 }

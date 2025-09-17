@@ -152,7 +152,7 @@ function AppContent() {
 
                 <div className="form-group">
                     <input
-                        className={`input-field ${inputVisible ? "hidden" : ""}`}
+                        className={`input-field ${inputVisible ? "" : "hidden"}`}
                         type="text"
                         value={input}
                         ref={inputRef}

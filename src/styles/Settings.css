@@ -19,7 +19,7 @@
     max-height: 80vh;
     background: var(--bg-primary);
     border-radius: 16px;
-    box-shadow: 0 20px 40px var(--shadow);
+    /* box-shadow: 0 20px 40px var(--shadow); */
     z-index: 1001;
     transition: all 0.3s ease;
     overflow: hidden;
@@ -99,7 +99,6 @@
     justify-content: center;
     background: var(--bg-tertiary);
     border-radius: 8px;
-    border: 1px solid var(--border-color);
 }
 
 .section-title {

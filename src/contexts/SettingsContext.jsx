@@ -5,6 +5,9 @@ const SettingsContext = createContext(null);
 
 // Default settings
 const defaultSettings = {
+    UI: {
+        compactMode: true,
+    },
     keyboard: {
         visible: true,
         container: true,
@@ -16,11 +19,11 @@ const defaultSettings = {
         lineHeight: "normal",
     },
     input: {
-        visible: false,
+        visible: true,
         autoFocus: true,
     },
     theme: {
-        mode: "light",
+        mode: "dark",
         colorScheme: "default",
     },
     game: {
@@ -30,41 +33,46 @@ const defaultSettings = {
     },
 };
 
-export function SettingsProvider({ children }) {
-    const [settings, setSettings] = useState(defaultSettings);
-
-    // Load settings from localStorage on mount
-    useEffect(() => {
-        try {
-            const savedSettings = localStorage.getItem('typing-game-settings');
-            if (savedSettings) {
-                const parsedSettings = JSON.parse(savedSettings);
-                // Merge with defaults to handle any missing properties
-                setSettings(prev => ({
-                    ...prev,
-                    ...parsedSettings,
-                    keyboard: { ...prev.keyboard, ...parsedSettings.keyboard },
-                    text: { ...prev.text, ...parsedSettings.text },
-                    input: { ...prev.input, ...parsedSettings.input },
-                    theme: { ...prev.theme, ...parsedSettings.theme },
-                    game: { ...prev.game, ...parsedSettings.game },
-                }));
-            }
-        } catch (error) {
-            console.error('Error loading settings from localStorage:', error);
+// localStorage helper functions
+const loadFromStorage = () => {
+    try {
+        const stored = localStorage.getItem('typingAppSettings');
+        if (stored) {
+            const parsedSettings = JSON.parse(stored);
+            // Merge with defaults to ensure all properties exist
+            return {
+                ...defaultSettings,
+                ...parsedSettings,
+                UI: { ...defaultSettings.UI, ...parsedSettings.UI },
+                keyboard: { ...defaultSettings.keyboard, ...parsedSettings.keyboard },
+                text: { ...defaultSettings.text, ...parsedSettings.text },
+                input: { ...defaultSettings.input, ...parsedSettings.input },
+                theme: { ...defaultSettings.theme, ...parsedSettings.theme },
+                game: { ...defaultSettings.game, ...parsedSettings.game },
+            };
         }
-    }, []);
+    } catch (error) {
+        console.warn('Failed to load settings from localStorage:', error);
+    }
+    return defaultSettings;
+};
+
+const saveToStorage = (settings) => {
+    try {
+        localStorage.setItem('typingAppSettings', JSON.stringify(settings));
+    } catch (error) {
+        console.warn('Failed to save settings to localStorage:', error);
+    }
+};
+
+export function SettingsProvider({ children }) {
+    const [settings, setSettings] = useState(loadFromStorage);
 
     // Save settings to localStorage whenever settings change
     useEffect(() => {
-        try {
-            localStorage.setItem('typing-game-settings', JSON.stringify(settings));
-        } catch (error) {
-            console.error('Error saving settings to localStorage:', error);
-        }
+        saveToStorage(settings);
     }, [settings]);
 
-    // Toggle a specific setting
     const toggleSetting = useCallback((category, key) => {
         setSettings(prev => ({
             ...prev,
@@ -89,6 +97,7 @@ export function SettingsProvider({ children }) {
     // Reset all settings to defaults
     const resetToDefaults = useCallback(() => {
         setSettings(defaultSettings);
+        localStorage.removeItem('typingAppSettings');
     }, []);
 
     // Apply theme to document body
@@ -106,6 +115,16 @@ export function SettingsProvider({ children }) {
             // Auto mode - check system preference
             const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
             body.classList.add(prefersDark ? 'dark-mode' : 'light-mode');
+            
+            // Listen for system theme changes
+            const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+            const handleChange = (e) => {
+                body.classList.remove('dark-mode', 'light-mode');
+                body.classList.add(e.matches ? 'dark-mode' : 'light-mode');
+            };
+            
+            mediaQuery.addEventListener('change', handleChange);
+            return () => mediaQuery.removeEventListener('change', handleChange);
         }
     }, [settings.theme.mode]);
 
@@ -119,7 +138,6 @@ export function SettingsProvider({ children }) {
         updateSetting,
         resetToDefaults,
         
-        // Individual settings for easy access
         // Keyboard
         keyboardVisible: settings.keyboard.visible,
         keyboardContainer: settings.keyboard.container,
