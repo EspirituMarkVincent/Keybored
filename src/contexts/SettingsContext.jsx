@@ -94,19 +94,28 @@ export function SettingsProvider({ children }) {
         }));
     }, []);
 
-    // Reset all settings to defaults
     const resetToDefaults = useCallback(() => {
         setSettings(defaultSettings);
         localStorage.removeItem('typingAppSettings');
     }, []);
 
+    const cycleTheme = useCallback(() => {
+        const mode = settings.theme.mode;
+        if (mode === "dark") {
+            updateSetting("theme", "mode", "light");
+        } else if (mode === "light") {
+            updateSetting("theme", "mode", "auto");
+        } else {
+            updateSetting("theme", "mode", "dark");
+        }
+    }, [settings.theme.mode, updateSetting]);
+
     // Apply theme to document body
     useEffect(() => {
         const body = document.body;
-        
-        // Remove existing theme classes
+
         body.classList.remove('dark-mode', 'light-mode');
-        
+
         if (settings.theme.mode === 'dark') {
             body.classList.add('dark-mode');
         } else if (settings.theme.mode === 'light') {
@@ -115,50 +124,52 @@ export function SettingsProvider({ children }) {
             // Auto mode - check system preference
             const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
             body.classList.add(prefersDark ? 'dark-mode' : 'light-mode');
-            
+
             // Listen for system theme changes
             const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
             const handleChange = (e) => {
                 body.classList.remove('dark-mode', 'light-mode');
                 body.classList.add(e.matches ? 'dark-mode' : 'light-mode');
             };
-            
+
             mediaQuery.addEventListener('change', handleChange);
             return () => mediaQuery.removeEventListener('change', handleChange);
         }
     }, [settings.theme.mode]);
 
+
     // Context value with all settings and helper functions
     const contextValue = {
         // Raw settings object
         settings,
-        
+
         // Helper functions
         toggleSetting,
         updateSetting,
         resetToDefaults,
-        
+
         // Keyboard
         keyboardVisible: settings.keyboard.visible,
         keyboardContainer: settings.keyboard.container,
         keyboardHighlight: settings.keyboard.highlightKeys,
-        
+
         // Text
         textContainer: settings.text.container,
         textFontSize: settings.text.fontSize,
         textLineHeight: settings.text.lineHeight,
-        
+
         // Input
         inputVisible: settings.input.visible,
         inputAutoFocus: settings.input.autoFocus,
-        
+
         // Theme
+        cycleTheme,
         themeMode: settings.theme.mode,
         colorScheme: settings.theme.colorScheme,
-        isDarkMode: settings.theme.mode === 'dark' || 
-                   (settings.theme.mode === 'auto' && 
-                    window.matchMedia('(prefers-color-scheme: dark)').matches),
-        
+        isDarkMode: settings.theme.mode === 'dark' ||
+            (settings.theme.mode === 'auto' &&
+                window.matchMedia('(prefers-color-scheme: dark)').matches),
+
         // Game
         showWPM: settings.game.showWPM,
         showAccuracy: settings.game.showAccuracy,

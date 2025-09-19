@@ -40,11 +40,13 @@ function AppContent() {
         inputVisible,
         inputAutoFocus,
         isDarkMode,
+        themeMode,
+        cycleTheme
     } = useSettings();
 
     // Remove local state that is now managed by SettingsContext
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-    
+
     // Update useEffect to use the isDarkMode value from context
     useEffect(() => {
         if (isDarkMode) document.body.classList.add("dark-mode");
@@ -70,13 +72,13 @@ function AppContent() {
                 <div className="divider"></div>
                 <button
                     className="theme-toggle-btn header-btn"
-                    onClick={() => {}} // Theme is now controlled by SettingsUI
+                    onClick={cycleTheme}
                 >
-                    {isDarkMode ? "🌒" : "🌙"}
+                    {themeMode === "auto" ? "🌓" : themeMode === "dark" ? "🌒" : "☀️"}
                 </button>
                 <button
                     className="keyboard-toggle-btn header-btn"
-                    onClick={() => {}} // Keyboard visibility is now controlled by SettingsUI
+                    onClick={() => { }}
                 >
                     ⌨️
                 </button>
@@ -92,9 +94,8 @@ function AppContent() {
                 <div className="menu-top">
                     <div className="gameModeSelection">
                         <button
-                            className={`game-mode-btn ${
-                                gameModeSettings.mode === "time" ? "active" : ""
-                            }`}
+                            className={`game-mode-btn ${gameModeSettings.mode === "time" ? "active" : ""
+                                }`}
                             onClick={() =>
                                 setGameModeSettings((prev) => ({ ...prev, mode: "time" }))
                             }
@@ -114,9 +115,8 @@ function AppContent() {
                                 </button>
                             ))}
                         <button
-                            className={`game-mode-btn ${
-                                gameModeSettings.mode === "words" ? "active" : ""
-                            }`}
+                            className={`game-mode-btn ${gameModeSettings.mode === "words" ? "active" : ""
+                                }`}
                             onClick={() =>
                                 setGameModeSettings((prev) => ({ ...prev, mode: "words" }))
                             }
@@ -224,7 +224,7 @@ createRoot(document.getElementById("root")).render(
     <StrictMode>
         <SettingsProvider>
             <GameProvider>
-                <AppContent/>
+                <AppContent />
             </GameProvider>
         </SettingsProvider>
     </StrictMode>
