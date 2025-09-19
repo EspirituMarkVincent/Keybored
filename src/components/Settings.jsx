@@ -129,7 +129,7 @@ const SettingsUI = ({ isOpen, onClose }) => {
                         </SettingRow>
                     </SettingSection>
 
-                    <SettingSection title="Input Field" icon="'📥'">
+                    <SettingSection title="Input Field" icon="📥">
                         <SettingRow
                             label="Show Input Field"
                             description="Display the input field below text"

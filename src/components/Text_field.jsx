@@ -128,7 +128,7 @@ export default function TextField({ showTextContainer = true }) {
         <div
             className="text-wrapper"
             style={
-                showTextContainer ? {} : { background: "none", border: "none", boxShadow: "none", padding: "0px"}
+                showTextContainer ? {} : { background: "none", border: "none", boxShadow: "none"}
             }
         >
             <div className="text-container" ref={textContainerRef}>
