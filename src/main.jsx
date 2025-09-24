@@ -41,7 +41,8 @@ function AppContent() {
         inputAutoFocus,
         isDarkMode,
         themeMode,
-        cycleTheme
+        cycleTheme,
+        settings
     } = useSettings();
 
     // Remove local state that is now managed by SettingsContext

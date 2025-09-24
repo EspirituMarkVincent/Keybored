@@ -53,6 +53,7 @@ export function GameProvider({ children }) {
         "yacht","yale","yard","yarn","yeast","zest","zing","zion","zips","zones"
     ];
 
+    // Render text from API
     const getText = useCallback(() => {
         setLoading(true);
         fetch("https://random-word-api.vercel.app/api?words=500")
@@ -162,6 +163,7 @@ export function GameProvider({ children }) {
         [input, wordIndex, words, typedHistory, resetEverything, restartText]
     );
 
+    // Assign tab
     useEffect(() => {
         getText();
         const handleTabKey = (e) => {
@@ -174,6 +176,7 @@ export function GameProvider({ children }) {
         return () => window.removeEventListener("keydown", handleTabKey);
     }, [getText, resetEverything]);
 
+    // Detect cursor position in input field
     useEffect(() => {
         const handleSelectionChange = () => {
             if (document.activeElement === inputRef.current)
@@ -185,6 +188,7 @@ export function GameProvider({ children }) {
 
     useEffect(() => resetEverything(), [gameModeSettings, resetEverything]);
 
+    // Calculate score
     useEffect(() => {
         if (!isStarted) return;
         const { totalCorrect, totalTyped } = calculateScore();

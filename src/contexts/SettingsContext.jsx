@@ -10,11 +10,11 @@ const defaultSettings = {
     },
     keyboard: {
         visible: true,
-        container: true,
+        container: false,
         highlightKeys: true,
     },
     text: {
-        container: true,
+        container: false,
         fontSize: "medium",
         lineHeight: "normal",
     },
@@ -125,7 +125,6 @@ export function SettingsProvider({ children }) {
             const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
             body.classList.add(prefersDark ? 'dark-mode' : 'light-mode');
 
-            // Listen for system theme changes
             const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
             const handleChange = (e) => {
                 body.classList.remove('dark-mode', 'light-mode');
