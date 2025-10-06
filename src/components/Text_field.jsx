@@ -14,6 +14,17 @@ const Word = memo(function Word({
     const isCurrent = wordIndex === currentWordIndex;
     const renderLen = Math.max(word.length, typed.length);
 
+    useEffect(() => {
+    const board = document.querySelector(".grid-board");
+    const resize = () => {
+      const scale = Math.min(window.innerWidth / 1200, 1);
+      board.style.zoom = scale;
+    };
+    resize();
+    window.addEventListener("resize", resize);
+    return () => window.removeEventListener("resize", resize);
+  }, []);
+
     return (
         <span className={`word line-${lineNum}`} ref={(el) => registerWordEl(wordIndex, el)}>
             {Array.from({ length: renderLen }).map((_, i) => {

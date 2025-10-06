@@ -140,15 +140,6 @@ const SettingsUI = ({ isOpen, onClose }) => {
                             />
                         </SettingRow>
 
-                        <SettingRow
-                            label="Auto Focus"
-                            description="Automatically focus input when page loads"
-                        >
-                            <ToggleSwitch
-                                isOn={settings.input.autoFocus}
-                                onToggle={() => toggleSetting("input", "autoFocus")}
-                            />
-                        </SettingRow>
                     </SettingSection>
 
                     <SettingSection title="Theme" icon="🎨">

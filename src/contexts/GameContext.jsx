@@ -221,7 +221,7 @@ export function GameProvider({ children }) {
     //save the score on finish
     useEffect(() => {
         if (isFinished) {
-            const existingScores = JSON.parse(localStorage.getItem('typing-game-scores')) || [];
+            const existingScores = JSON.parse(localStorage.getItem('local-scores')) || [];
 
             const newScore = {
                 wpm: score.standardWPM,
@@ -232,7 +232,7 @@ export function GameProvider({ children }) {
             };
 
             const updatedScores = [...existingScores, newScore];
-            localStorage.setItem('typing-game-scores', JSON.stringify(updatedScores));
+            localStorage.setItem('local-scores', JSON.stringify(updatedScores));
         }
     }, [isFinished, score, gameModeSettings]);
 

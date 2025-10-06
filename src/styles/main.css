@@ -1,208 +1,211 @@
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
 
 :root {
-    --bg-primary: #F9FAFB;
-    --bg-secondary: #E5E7EB;
-    --bg-tertiary: #D1D5DB; 
-    --text-primary: #000000;
-    --text-secondary: #333333;
-    --border-color: #ccc;
-    --border-hover: #aaa;
-    --button-hover: #afafaf;
-    --correct-color: #22c55e;
-    --incorrect-color: #ef4444;
-    --excess-color: #ff7b7b;
-    --highlight-bg: #9ca3af;
-    --input-bg: #ffffff;
-    --shadow: rgba(0, 0, 0, 0.15);
-    --key-shadow: rgba(0, 0, 0, 0.15);
+  --bg-primary: #f9fafb;
+  --bg-secondary: #e5e7eb;
+  --bg-tertiary: #d1d5db;
+  --text-primary: #000000;
+  --text-secondary: #333333;
+  --border-color: #ccc;
+  --border-hover: #aaa;
+  --button-hover: #afafaf;
+  --correct-color: #22c55e;
+  --incorrect-color: #ef4444;
+  --excess-color: #ff7b7b;
+  --highlight-bg: #9ca3af;
+  --input-bg: #ffffff;
+  --shadow: rgba(0, 0, 0, 0.15);
+  --key-shadow: rgba(0, 0, 0, 0.15);
 }
 
 .dark-mode {
-    --bg-primary: #121212;
-    --bg-secondary: #1e1e1e;
-    --bg-tertiary: #2a2a2a;  
-    --text-primary: #E0E0E0;
-    --text-secondary: #E0E0E0;
-    --border-color: #4a4a4a;
-    --border-hover: #6a6a6a;
-    --button-hover: #505050;
-    --correct-color: #10b981;
-    --incorrect-color: #f87171;
-    --excess-color: #fca5a5;
-    --highlight-bg: #424242;
-    --input-bg: #2d2d2d;
-    --shadow: rgba(255, 255, 255, 0.1);
-    --key-shadow: rgba(255, 255, 255, 0.07);
+  --bg-primary: #121212;
+  --bg-secondary: #1e1e1e;
+  --bg-tertiary: #2a2a2a;
+  --text-primary: #e0e0e0;
+  --text-secondary: #e0e0e0;
+  --border-color: #4a4a4a;
+  --border-hover: #6a6a6a;
+  --button-hover: #505050;
+  --correct-color: #10b981;
+  --incorrect-color: #f87171;
+  --excess-color: #fca5a5;
+  --highlight-bg: #424242;
+  --input-bg: #2d2d2d;
+  --shadow: rgba(255, 255, 255, 0.1);
+  --key-shadow: rgba(255, 255, 255, 0.07);
 }
 
 body {
-    font-family: "Poppins", sans-serif;
-    background-color: var(--bg-primary);
-    color: var(--text-primary);
-    margin: 0;
-    padding: 0;
-    transition: all 0.3s ease;
+  font-family: "Poppins", sans-serif;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  margin: 0;
+  padding: 0;
+  transition: all 0.3s ease;
 }
 
 .header-container {
-    display: flex;
-    align-items: center;
-    padding: 0.5rem 1rem;
-    gap: 7px;
-    background-color: var(--bg-primary);
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  gap: 7px;
+  background-color: var(--bg-primary);
+  transition: background-color 0.3s ease;
 }
 
 .header-txt {
-    font-weight: bold;
-    font-size: 50px;
+  font-weight: bold;
+  font-size: 50px;
+  color: var(--bg-tertiary);
 }
 
 .divider {
-    flex-grow: 1;
+  flex-grow: 1;
 }
 
 .header-btn {
-    background-color: var(--bg-secondary);
-    border-radius: 50%;
-    border: none;                /* remove border */
-    outline: none;  
-    width: 50px;
-    height: 50px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    font-size: 20px;
-    transition: all 0.3s ease;
-    padding-bottom: 5px;
+  background-color: var(--bg-secondary);
+  border-radius: 50%;
+  border: none;
+  outline: none;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 20px;
+  transition: all 0.3s ease;
+  padding-bottom: 5px;
 }
 
 .header-btn:hover {
-    background-color: var(--button-hover);
+  background-color: var(--button-hover);
 }
 
 /* input field */
 .main-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    min-height: 100vh;
-    background-color: var(--bg-primary);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  background-color: var(--bg-primary);
+  zoom: 0.9;
+  transition: background-color 0.3s ease;
 }
 
 .gameModeSelection {
-    display: flex;
-    flex-direction: row;
-    border-radius: 10px;
-    overflow: hidden;
-    transform: scale(1.3);
-    margin-bottom: 5px;
+  display: flex;
+  flex-direction: row;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 5px;
 }
 
 .game-mode-btn {
-    margin: 0px;
-    border: 0px solid var(--border-color);
-    font-family: "Poppins", sans-serif;
-    font-weight: 600;
-    background-color: var(--bg-secondary);
-    color: var(--text-primary);
-    padding: 8px 16px;
-    transition: all 0.3s ease;
+  margin: 0px;
+  border: 0px solid var(--border-color);
+  font-family: "Poppins", sans-serif;
+  font-weight: 600;
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  padding: 8px 16px;
+  transition: all 0.3s ease;
 }
 
 .game-mode-btn:hover {
-    cursor: pointer;
-    background-color: var(--button-hover);
+  cursor: pointer;
+  background-color: var(--button-hover);
 }
 
 .game-mode-btn.active {
-    background-color: var(--correct-color);
-    color: white;
-    border-color: var(--correct-color);
+  background-color: var(--correct-color);
+  color: white;
+  border-color: var(--correct-color);
 }
 
 .game-result-container {
-    margin: 10px;
-    color: var(--text-primary);
-    font-size: 20px;
-    font-weight: 600;
-    text-align: center;
-    background-color: var(--bg-secondary);
-    padding: 15px 25px;
-    border-radius: 10px;
-    border: 1px solid var(--border-color);
-    box-shadow: 0 2px 4px var(--shadow);
+  margin: 10px;
+  color: var(--text-primary);
+  font-size: 20px;
+  font-weight: 600;
+  text-align: center;
+  background-color: var(--bg-secondary);
+  padding: 15px 25px;
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 2px 4px var(--shadow);
 }
 
 /* Input group */
 .form-group {
-    height: 60px;
-    display: flex;
-    flex-direction: row;
-    padding: 0%;
-    gap: 10px;
-    justify-content: center;
-    transition: all 0.3s ease-in-out;
+  height: 60px;
+  display: flex;
+  flex-direction: row;
+  padding: 0%;
+  gap: 10px;
+  justify-content: center;
+  transition: all 0.3s ease-in-out;
 }
 
 .form-group.finished {
-    gap: 0;
+  gap: 0;
 }
 
 .input-field {
-    width: 430px;
-    border-radius: 8px;
-    border: 2px solid var(--bg-secondary);
-    background-color: var(--bg-secondary);
-    color: var(--text-tertiary);
-    padding: 10px 16px;
-    font-size: 24px;
-    text-align: center;
-    font-family: monospace;
-    transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out, width 0.3s ease-in-out,
-        padding 0.3s ease-in-out;
-    overflow: hidden;
+  width: 430px;
+  border-radius: 8px;
+  border: 2px solid var(--bg-secondary);
+  background-color: var(--bg-secondary);
+  color: var(--text-tertiary);
+  padding: 10px 16px;
+  font-size: 24px;
+  text-align: center;
+  font-family: monospace;
+  transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out,
+    width 0.3s ease-in-out, padding 0.3s ease-in-out;
+  overflow: hidden;
 }
 
 .input-field.hidden {
-    transform: scale(0);
-    width: 0;
-    opacity: 0;
-    padding: 0;
+  transform: scale(0);
+  width: 0;
+  opacity: 0;
+  padding: 0;
 }
 
 .input-field:focus {
-    outline: none;
-    border-color: var(--bg-tertiary);
+  outline: none;
+  border-color: var(--bg-tertiary);
 }
 
 .input-field:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .stat-box {
-    width: 140px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: var(--bg-secondary);
-    border-radius: 8px;
-    font-size: 20px;
-    font-weight: 600;
-    color: var(--text-primary);
-    transition: all 0.3s ease;
+  width: 140px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--bg-secondary);
+  border-radius: 8px;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text-primary);
+  transition: all 0.3s ease;
 }
 
 .stat-box.reset-button {
-    cursor: pointer;
-    background-color: var(--incorrect-color);
-    color: white;
+  cursor: pointer;
+  background-color: var(--incorrect-color);
+  color: white;
 }
 
 .stat-box.reset-button:hover {
-    background-color: #dc2626;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 8px var(--shadow);
+  background-color: #dc2626;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px var(--shadow);
 }

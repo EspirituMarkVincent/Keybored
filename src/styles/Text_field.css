@@ -1,73 +1,68 @@
-.word {
-    font-family: "Open Sans", sans-serif;
-    font-size: 30px;
-    font-family: monospace;
-    margin-bottom: 10px;
-    display: flex;
-    flex-direction: row;
+.text-wrapper {
+  height: calc(48px * 3);
+  max-width: 1000px;
+  overflow: hidden;
+  background-color: var(--bg-secondary);
+  border-radius: 12px;
+  padding: clamp(6px, 2vw, 20px) clamp(10px, 3vw, 20px);
+  margin: 15px auto;
+  transition: all 0.3s ease;
 }
 
-.text-wrapper {
-    width: 1000px;
-    height: calc(48px * 3);
-    overflow: hidden;
-    background-color: var(--bg-secondary);
-    border-radius: 12px;
-    padding: 10px 20px;
-    margin: 15px;
-    transition: all 0.3s ease;
+.word {
+  font-family: monospace, "Open Sans", sans-serif;
+  font-size: 30px;
+  margin-bottom: 10px;
+  display: flex;
+  flex-direction: row;
 }
 
 .text-container {
-    position: relative;
-    line-height: 40px;
-    overflow-y: auto;
-    max-height: 100%;
-    display: flex;
-    flex-wrap: wrap;
-    scrollbar-width: none;
-    user-select: none;
+  position: relative;
+  line-height: 40px;
+  overflow-y: auto;
+  max-height: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  scrollbar-width: none;
+  user-select: none;
 }
 
-.word.lineDone {
-    display: none;
-}
+.word.lineDone { display: none; }
 
 .letter {
-    z-index: 2;
+  z-index: 2;
+  transition: all 0.2s ease;
 }
 
 .letter.highlight {
-    background-color: var(--highlight-bg);
-    color: var(--text-primary);
-    border-radius: 4px;
-    transition: all 0.2s ease;
+  background-color: var(--highlight-bg);
+  color: var(--text-primary);
+  border-radius: 4px;
 }
 
 .letter.excess {
-    color: var(--excess-color);
-    border-radius: 4px;
-    transition: all 0.2s ease;
+  color: var(--excess-color);
+  border-radius: 4px;
 }
 
 .letter.incorrect {
-    color: var(--incorrect-color);
-    border-radius: 4px;
-    transition: all 0.2s ease;
+  color: var(--incorrect-color);
+  border-radius: 4px;
 }
 
 .letter.correct {
-    color: var(--correct-color);
-    border-radius: 4px;
-    transition: all 0.2s ease;
+  color: var(--correct-color);
+  border-radius: 4px;
 }
 
+/* Cursor animation */
 .smooth-cursor {
-    position: absolute;
-    top: 0;
-    left: 0;
-    background-color: var(--highlight-bg);
-    border-radius: 4px;
-    transition: transform 0.1s ease-out, width 0.1s ease-out;
-    pointer-events: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color: var(--highlight-bg);
+  border-radius: 4px;
+  transition: transform 0.1s ease-out, width 0.1s ease-out;
+  pointer-events: none;
 }
