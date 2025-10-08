@@ -11,7 +11,7 @@ import "./styles/Keyboard.css";
 import "./styles/Settings.css";
 import "./styles/Text_field.css";
 
-function AppContent() {
+function App() {
   const {
     cursorPos,
     words,
@@ -22,6 +22,7 @@ function AppContent() {
     wordIndex,
     typedHistory,
     isFinished,
+    isStarted,
     timer,
     score,
     isUserTyping,
@@ -40,7 +41,6 @@ function AppContent() {
     if (isDarkMode) document.body.classList.add("dark-mode");
     else document.body.classList.remove("dark-mode");
   }, [isDarkMode]);
-  
 
   // force to focus on inputfield at run
   useEffect(() => {
@@ -53,8 +53,26 @@ function AppContent() {
     return () => window.removeEventListener("keydown", forceFocus);
   }, []);
 
+  useEffect(() => {
+    console.log(isUserTyping);
+  }, [isUserTyping]);
+
   return (
     <div>
+      {isStarted && !isFinished && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100vw",
+            height: "100vh",
+            backgroundColor: "var(--bg-primary)",
+            zIndex: 2,
+          }}
+        />
+      )}
+
       <SettingsUI
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}
@@ -136,7 +154,21 @@ function AppContent() {
           </div>
         </div>
 
-        <TextField showTextContainer={settings.text.container} />
+        <div style={{ position: "relative", zIndex: 3 }}>
+          <TextField showTextContainer={settings.text.container} />
+        </div>
+
+        <div style={{ position: "relative", zIndex: 3 }}>
+          {isFinished ? (
+            <Scores />
+          ) : (
+            <Keyboard
+              isUserTyping={isUserTyping}
+              isKeyboardActive={settings.keyboard.visible}
+              showKeyboardContainer={settings.keyboard.container}
+            />
+          )}
+        </div>
 
         <div className="form-group">
           <input
@@ -188,16 +220,6 @@ function AppContent() {
             Reset
           </div>
         </div>
-
-        {isFinished ? (
-          <Scores />
-        ) : (
-          <Keyboard
-            isUserTyping={isUserTyping}
-            isKeyboardActive={settings.keyboard.visible}
-            showKeyboardContainer={settings.keyboard.container}
-          />
-        )}
       </div>
     </div>
   );
@@ -207,7 +229,7 @@ createRoot(document.getElementById("root")).render(
   <StrictMode>
     <SettingsProvider>
       <GameProvider>
-        <AppContent />
+        <App />
       </GameProvider>
     </SettingsProvider>
   </StrictMode>

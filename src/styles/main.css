@@ -147,13 +147,15 @@ body {
   gap: 10px;
   justify-content: center;
   transition: all 0.3s ease-in-out;
+  z-index: 3;
+  margin: 10px;
 }
 
 .form-group.finished {
   gap: 0;
 }
 
-.input-field {
+/* .input-field {
   width: 430px;
   border-radius: 8px;
   border: 2px solid var(--bg-secondary);
@@ -166,9 +168,9 @@ body {
   transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out,
     width 0.3s ease-in-out, padding 0.3s ease-in-out;
   overflow: hidden;
-}
+} */
 
-.input-field.hidden {
+.input-field {
   transform: scale(0);
   width: 0;
   opacity: 0;
