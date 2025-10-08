@@ -120,9 +120,8 @@ body {
 }
 
 .game-mode-btn.active {
-  background-color: var(--correct-color);
-  color: white;
-  border-color: var(--correct-color);
+  background-color: var(--bg-tertiary);
+  color: var(--text-primary);
 }
 
 .game-result-container {
@@ -149,6 +148,7 @@ body {
   transition: all 0.3s ease-in-out;
   z-index: 3;
   margin: 10px;
+  transform-origin: top;
 }
 
 .form-group.finished {
@@ -202,12 +202,41 @@ body {
 
 .stat-box.reset-button {
   cursor: pointer;
-  background-color: var(--incorrect-color);
-  color: white;
+  background-color: var(--bg-secondary);
 }
 
 .stat-box.reset-button:hover {
   background-color: #dc2626;
   transform: translateY(-1px);
   box-shadow: 0 4px 8px var(--shadow);
+}
+
+@media (max-width: 768px) {
+  .form-group {
+    transform: scale(0.6);
+  }
+
+  .gameModeSelection {
+    transform: scale(0.8);
+  }
+}
+
+@media (max-width: 480px) {
+  .form-group {
+    transform: scale(0.5);
+  }
+
+  .gameModeSelection {
+    transform: scale(0.7);
+  }
+}
+
+@media (max-width: 360px) {
+  .form-group {
+    transform: scale(0.3);
+  }
+
+  .gameModeSelection {
+    transform: scale(0.7);
+  }
 }
