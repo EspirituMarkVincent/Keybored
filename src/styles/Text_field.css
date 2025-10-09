@@ -1,38 +1,56 @@
+@import "tailwindcss";
+
 .text-wrapper {
-  height: calc(48px * 3);
+  height: 160px !important;
   max-width: 1000px;
   overflow: hidden;
   background-color: var(--bg-secondary);
   border-radius: 12px;
-  padding: clamp(6px, 2vw, 20px) clamp(10px, 3vw, 20px);
+  padding: 15px 20px;
   margin: 15px auto;
   transition: all 0.3s ease;
+  box-sizing: border-box;
 }
 
 .word {
   font-family: monospace, "Open Sans", sans-serif;
   font-size: 30px;
-  margin-bottom: 10px;
-  display: flex;
+  margin-right: 10px;
+  margin-bottom: 0 !important;
+  display: inline-flex;
   flex-direction: row;
+  line-height: 40px;
+  height: 40px;
 }
 
 .text-container {
   position: relative;
-  line-height: 40px;
-  overflow-y: auto;
+  overflow-y: hidden;
   max-height: 100%;
-  display: flex;
-  flex-wrap: wrap;
+  display: block;
+  line-height: 40px !important;
   scrollbar-width: none;
   user-select: none;
 }
 
-.word.lineDone { display: none; }
+.text-container::-webkit-scrollbar {
+  display: none;
+}
+
+.word.lineDone { 
+  display: none; 
+}
 
 .letter {
   z-index: 2;
   transition: all 0.2s ease;
+  line-height: 40px;
+  height: 40px;
+  display: inline-block;
+}
+
+.letter.space {
+  width: 0.5ch;
 }
 
 .letter.highlight {
@@ -65,4 +83,51 @@
   border-radius: 4px;
   transition: transform 0.1s ease-out, width 0.1s ease-out;
   pointer-events: none;
+  z-index: 1;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .text-wrapper {
+    height: 135px !important;
+    padding: 12px 15px;
+  }
+  
+  .word {
+    font-size: 26px;
+    line-height: 36px;
+    height: 36px;
+  }
+  
+  .letter {
+    line-height: 36px;
+    height: 36px;
+  }
+  
+  .text-container {
+    line-height: 36px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .text-wrapper {
+    height: 120px !important;
+    padding: 10px 12px;
+  }
+  
+  .word {
+    font-size: 22px;
+    line-height: 32px;
+    height: 32px;
+    margin-right: 8px;
+  }
+  
+  .letter {
+    line-height: 32px;
+    height: 32px;
+  }
+  
+  .text-container {
+    line-height: 32px !important;
+  }
 }

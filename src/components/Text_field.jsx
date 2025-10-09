@@ -1,5 +1,6 @@
 import { useRef, useEffect, useState, memo, useCallback } from "react";
 import { useGame } from "../contexts/GameContext";
+import "../styles/Text_field.css";
 
 const Word = memo(function Word({
     word,

@@ -1,6 +1,7 @@
+@import "tailwindcss";
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
 
-:root {
+@theme {
   --bg-primary: #f9fafb;
   --bg-secondary: #e5e7eb;
   --bg-tertiary: #d1d5db;
@@ -154,21 +155,6 @@ body {
 .form-group.finished {
   gap: 0;
 }
-
-/* .input-field {
-  width: 430px;
-  border-radius: 8px;
-  border: 2px solid var(--bg-secondary);
-  background-color: var(--bg-secondary);
-  color: var(--text-tertiary);
-  padding: 10px 16px;
-  font-size: 24px;
-  text-align: center;
-  font-family: monospace;
-  transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out,
-    width 0.3s ease-in-out, padding 0.3s ease-in-out;
-  overflow: hidden;
-} */
 
 .input-field {
   transform: scale(0);

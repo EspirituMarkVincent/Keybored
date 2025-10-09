@@ -7,9 +7,7 @@ import Scores from "./components/Scores";
 import { GameProvider, useGame } from "./contexts/GameContext";
 import { SettingsProvider, useSettings } from "./contexts/SettingsContext";
 import "./styles/main.css";
-import "./styles/Keyboard.css";
 import "./styles/Settings.css";
-import "./styles/Text_field.css";
 
 function App() {
   const {
