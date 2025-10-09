@@ -11,7 +11,7 @@ export default function Scores() {
   }, []);
 
   return (
-    <div className="p-4">
+    <div className="p-4 grid grid-cols-1">
       <h2 className="text-2xl font-bold mb-4">Scores</h2>
       {scoreList.length > 0 ? (
         <ul className="space-y-2">

@@ -1,5 +1,6 @@
  import React from "react";
 import { useSettings } from "../contexts/SettingsContext";
+import "../styles/Settings.css";
 
 const SettingsUI = ({ isOpen, onClose }) => {
     // Use the useSettings hook to get settings and control functions

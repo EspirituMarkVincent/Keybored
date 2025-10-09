@@ -7,7 +7,6 @@ import Scores from "./components/Scores";
 import { GameProvider, useGame } from "./contexts/GameContext";
 import { SettingsProvider, useSettings } from "./contexts/SettingsContext";
 import "./styles/main.css";
-import "./styles/Settings.css";
 
 function App() {
   const {
@@ -34,6 +33,7 @@ function App() {
   const { settings, isDarkMode, themeMode, cycleTheme } = useSettings();
 
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isScoresOpen, setIsScoresOpen] = useState(false);
 
   useEffect(() => {
     if (isDarkMode) document.body.classList.add("dark-mode");
@@ -58,17 +58,7 @@ function App() {
   return (
     <div>
       {isStarted && !isFinished && (
-        <div
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            width: "100vw",
-            height: "100vh",
-            backgroundColor: "var(--bg-primary)",
-            zIndex: 2,
-          }}
-        />
+        <div className="fixed top-0 left-0 w-screen h-screen bg-bg-primary z-[2]" />
       )}
 
       <SettingsUI
@@ -152,12 +142,12 @@ function App() {
           </div>
         </div>
 
-        <div style={{ position: "relative", zIndex: 3 }}>
+        <div className="relative z-[3] px-[10px]">
           <TextField showTextContainer={settings.text.container} />
         </div>
 
-        <div style={{ position: "relative", zIndex: 3 }}>
-          {isFinished ? (
+        <div className="relative z-[3]">
+          {isFinished || isScoresOpen ? (
             <Scores />
           ) : (
             <Keyboard

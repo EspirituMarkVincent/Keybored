@@ -1,46 +1,47 @@
-@import "tailwindcss";
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
+@import "tailwindcss";
 
 @theme {
-  --bg-primary: #f9fafb;
-  --bg-secondary: #e5e7eb;
-  --bg-tertiary: #d1d5db;
-  --text-primary: #000000;
-  --text-secondary: #333333;
-  --border-color: #ccc;
-  --border-hover: #aaa;
-  --button-hover: #afafaf;
-  --correct-color: #22c55e;
-  --incorrect-color: #ef4444;
-  --excess-color: #ff7b7b;
-  --highlight-bg: #9ca3af;
-  --input-bg: #ffffff;
+  --font-Poppins: "Poppins", sans-serif;
+  --color-bg-primary: #f9fafb;
+  --color-bg-secondary: #e5e7eb;
+  --color-bg-tertiary: #d1d5db;
+  --color-text-primary: #000000;
+  --color-text-secondary: #333333;
+  --color-border: #ccc;
+  --color-border-hover: #aaa;
+  --color-button-hover: #afafaf;
+  --color-correct: #22c55e;
+  --color-incorrect: #ef4444;
+  --color-excess: #ff7b7b;
+  --color-highlight-bg: #9ca3af;
+  --color-input-bg: #ffffff;
   --shadow: rgba(0, 0, 0, 0.15);
   --key-shadow: rgba(0, 0, 0, 0.15);
 }
 
 .dark-mode {
-  --bg-primary: #121212;
-  --bg-secondary: #1e1e1e;
-  --bg-tertiary: #2a2a2a;
-  --text-primary: #e0e0e0;
-  --text-secondary: #e0e0e0;
-  --border-color: #4a4a4a;
-  --border-hover: #6a6a6a;
-  --button-hover: #505050;
-  --correct-color: #10b981;
-  --incorrect-color: #f87171;
-  --excess-color: #fca5a5;
-  --highlight-bg: #424242;
-  --input-bg: #2d2d2d;
+  --color-bg-primary: #121212;
+  --color-bg-secondary: #1e1e1e;
+  --color-bg-tertiary: #2a2a2a;
+  --color-text-primary: #e0e0e0;
+  --color-text-secondary: #e0e0e0;
+  --color-border: #4a4a4a;
+  --color-border-hover: #6a6a6a;
+  --color-button-hover: #505050;
+  --color-correct: #10b981;
+  --color-incorrect: #f87171;
+  --color-excess: #fca5a5;
+  --color-highlight-bg: #424242;
+  --color-input-bg: #2d2d2d;
   --shadow: rgba(255, 255, 255, 0.1);
   --key-shadow: rgba(255, 255, 255, 0.07);
 }
 
 body {
   font-family: "Poppins", sans-serif;
-  background-color: var(--bg-primary);
-  color: var(--text-primary);
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
   margin: 0;
   padding: 0;
   transition: all 0.3s ease;
@@ -51,14 +52,14 @@ body {
   align-items: center;
   padding: 0.5rem 1rem;
   gap: 7px;
-  background-color: var(--bg-primary);
+  background-color: var(--color-bg-primary);
   transition: background-color 0.3s ease;
 }
 
 .header-txt {
   font-weight: bold;
   font-size: 50px;
-  color: var(--bg-tertiary);
+  color: var(--color-bg-tertiary);
 }
 
 .divider {
@@ -66,7 +67,7 @@ body {
 }
 
 .header-btn {
-  background-color: var(--bg-secondary);
+  background-color: var(--color-bg-secondary);
   border-radius: 50%;
   border: none;
   outline: none;
@@ -82,7 +83,7 @@ body {
 }
 
 .header-btn:hover {
-  background-color: var(--button-hover);
+  background-color: var(--color-button-hover);
 }
 
 /* input field */
@@ -91,7 +92,7 @@ body {
   flex-direction: column;
   align-items: center;
   min-height: 100vh;
-  background-color: var(--bg-primary);
+  background-color: var(--color-bg-primary);
   zoom: 0.9;
   transition: background-color 0.3s ease;
 }
@@ -106,35 +107,35 @@ body {
 
 .game-mode-btn {
   margin: 0px;
-  border: 0px solid var(--border-color);
+  border: 0px solid var(--color-border);
   font-family: "Poppins", sans-serif;
   font-weight: 600;
-  background-color: var(--bg-secondary);
-  color: var(--text-primary);
+  background-color: var(--color-bg-secondary);
+  color: var(--color-text-primary);
   padding: 8px 16px;
   transition: all 0.3s ease;
 }
 
 .game-mode-btn:hover {
   cursor: pointer;
-  background-color: var(--button-hover);
+  background-color: var(--color-button-hover);
 }
 
 .game-mode-btn.active {
-  background-color: var(--bg-tertiary);
-  color: var(--text-primary);
+  background-color: var(--color-bg-tertiary);
+  color: var(--color-text-primary);
 }
 
 .game-result-container {
   margin: 10px;
-  color: var(--text-primary);
+  color: var(--color-text-primary);
   font-size: 20px;
   font-weight: 600;
   text-align: center;
-  background-color: var(--bg-secondary);
+  background-color: var(--color-bg-secondary);
   padding: 15px 25px;
   border-radius: 10px;
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--color-border);
   box-shadow: 0 2px 4px var(--shadow);
 }
 
@@ -165,7 +166,7 @@ body {
 
 .input-field:focus {
   outline: none;
-  border-color: var(--bg-tertiary);
+  border-color: var(--color-bg-tertiary);
 }
 
 .input-field:disabled {
@@ -178,17 +179,17 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: var(--bg-secondary);
+  background-color: var(--color-bg-secondary);
   border-radius: 8px;
   font-size: 20px;
   font-weight: 600;
-  color: var(--text-primary);
+  color: var(--color-text-primary);
   transition: all 0.3s ease;
 }
 
 .stat-box.reset-button {
   cursor: pointer;
-  background-color: var(--bg-secondary);
+  background-color: var(--color-bg-secondary);
 }
 
 .stat-box.reset-button:hover {

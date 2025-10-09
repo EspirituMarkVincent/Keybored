@@ -3,26 +3,22 @@
     justify-content: center;
     transform-origin: top center;
     padding: 20px;
-    background-color: var(--bg-secondary);
+    background-color: var(--color-bg-secondary);
     border-radius: 12px;
     border: none;
     transition: all 0.3s ease;
 }
-
-
 .grid-board.hidden {
     transform: scale(0);
     opacity: 0;
 }
-
 .grid-row {
     display: flex;
     justify-content: space-between;
 }
-
 .grid-key {
-    background: var(--bg-tertiary);
-    color: var(--text-primary);
+    background: var(--color-bg-tertiary);
+    color: var(--color-text-primary);
     padding: 0;
     border-radius: 8px;
     height: 60px;
@@ -36,25 +32,21 @@
     font-family: "Poppins", sans-serif;
     transition: all 0.2s ease;
 }
-
 .grid-key.pressed {
-    background-color: var(--button-hover);
+    background-color: var(--color-button-hover);
     transform: translateY(1px);
     box-shadow: none;
 }
-
 .grid-key:hover {
-    background-color: var(--button-hover);
+    background-color: var(--color-button-hover);
 }
-
 .keyboard-settings-container {
-    color: var(--text-primary);
-    background-color: var(--bg-secondary);
+    color: var(--color-text-primary);
+    background-color: var(--color-bg-secondary);
     font-size: 18px;
     background: none;
     border: none;
 }
-
 .keyboard-toggle {
     border: none;
     background: none;
