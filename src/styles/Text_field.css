@@ -15,7 +15,6 @@
 .word {
   font-family: monospace, "Open Sans", sans-serif;
   font-size: 30px;
-  margin-right: 10px;
   margin-bottom: 0 !important;
   display: inline-flex;
   flex-direction: row;
@@ -46,9 +45,6 @@
   line-height: 40px;
   height: 40px;
   display: inline-block;
-}
-.letter.space {
-  width: 0.5ch;
 }
 .letter.highlight {
   background-color: var(--color-highlight-bg);

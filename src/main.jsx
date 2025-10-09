@@ -6,6 +6,12 @@ import SettingsUI from "./components/Settings";
 import Scores from "./components/Scores";
 import { GameProvider, useGame } from "./contexts/GameContext";
 import { SettingsProvider, useSettings } from "./contexts/SettingsContext";
+import AutoIcon from "./assets/icons/auto.svg?react";
+import DarkIcon from "./assets/icons/dark.svg?react";
+import LightIcon from "./assets/icons/light.svg?react";
+import ScoreIcon from "./assets/icons/score.svg?react";
+import SettingsIcon from "./assets/icons/settings.svg?react";
+import KeyboardIcon from "./assets/icons/keyboard.svg?react";
 import "./styles/main.css";
 
 function App() {
@@ -30,7 +36,7 @@ function App() {
     handleKeyDown,
   } = useGame();
 
-  const { settings, isDarkMode, themeMode, cycleTheme } = useSettings();
+  const { settings, isDarkMode, themeMode, cycleTheme, toggleSetting } = useSettings();
 
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isScoresOpen, setIsScoresOpen] = useState(false);
@@ -51,10 +57,6 @@ function App() {
     return () => window.removeEventListener("keydown", forceFocus);
   }, []);
 
-  useEffect(() => {
-    console.log(isUserTyping);
-  }, [isUserTyping]);
-
   return (
     <div>
       {isStarted && !isFinished && (
@@ -69,17 +71,39 @@ function App() {
       <div className="header-container">
         <div className="header-txt">Keybored</div>
         <div className="divider"></div>
-        <button className="theme-toggle-btn header-btn" onClick={cycleTheme}>
-          {themeMode === "auto" ? "🌓" : themeMode === "dark" ? "🌒" : "☀️"}
-        </button>
-        <button className="keyboard-toggle-btn header-btn" onClick={() => {}}>
-          ⌨️
-        </button>
+
         <button
-          className="settings-btn header-btn"
+          className="theme-toggle-btn header-btn text-bg-tertiary"
+          onClick={cycleTheme}
+        >
+          {themeMode === "auto" ? (
+            <AutoIcon className="w-8 h-8" />
+          ) : themeMode === "dark" ? (
+            <DarkIcon className="w-8 h-8" />
+          ) : (
+            <LightIcon className="w-8 h-8" />
+          )}
+        </button>
+
+        <button
+          className="keyboard-toggle-btn header-btn text-bg-tertiary"
+          onClick={() => toggleSetting('keyboard', 'visible')}
+        >
+          <KeyboardIcon className="w-8 h-8" />
+        </button>
+
+        <button
+          className="settings-btn header-btn text-bg-tertiary"
+          onClick={() => setIsScoresOpen((prev) => !prev)}
+        >
+          <ScoreIcon className="w-8 h-8" />
+        </button>
+
+        <button
+          className="settings-btn header-btn text-bg-tertiary"
           onClick={() => setIsSettingsOpen((prev) => !prev)}
         >
-          ⚙️
+          <SettingsIcon className="w-8 h-8" />
         </button>
       </div>
 
@@ -147,7 +171,7 @@ function App() {
         </div>
 
         <div className="relative z-[3]">
-          {isFinished || isScoresOpen ? (
+          {isFinished || (!isUserTyping && isScoresOpen) ? (
             <Scores />
           ) : (
             <Keyboard
