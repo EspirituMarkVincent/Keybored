@@ -257,7 +257,7 @@ export function GameProvider({ children }) {
       const updatedScores = [...existingScores, newScore];
       localStorage.setItem("local-scores", JSON.stringify(updatedScores));
     }
-  }, [isFinished, score, gameModeSettings]);
+  }, [isFinished]);
 
   // debugging
   useEffect(() => {

@@ -3,14 +3,40 @@ import "../styles/main.css";
 
 export default function Scores() {
   const [scoreList, setScoreList] = useState([]);
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    const storedScores = JSON.parse(localStorage.getItem("local-scores")) || [];
-    setScoreList(storedScores);
+    const loadScores = () => {
+      const storedScores = JSON.parse(localStorage.getItem("local-scores")) || [];
+      setScoreList(storedScores);
+    };
+
+    loadScores();
+    
+    // Delay visibility to prevent flicker
+    const visibilityTimer = setTimeout(() => setIsVisible(true), 100);
+    
+    const intervalId = setInterval(loadScores, 500);
+
+    const handleStorageChange = (e) => {
+      if (e.key === "local-scores") {
+        loadScores();
+      }
+    };
+    window.addEventListener("storage", handleStorageChange);
+
+    return () => {
+      clearTimeout(visibilityTimer);
+      clearInterval(intervalId);
+      window.removeEventListener("storage", handleStorageChange);
+    };
   }, []);
 
   return (
-    <div className="p-6 bg-bg-secondary rounded-xl max-w-3xl mx-auto mt-3">
+    <div 
+      className="p-6 bg-bg-secondary rounded-xl max-w-3xl mx-auto mt-3 transition-opacity duration-300 min-h-[280px]"
+      style={{ opacity: isVisible ? 1 : 0 }}
+    >
       <h2 className="text-2xl font-bold mb-4 text-center text-text-primary">
         Scores
       </h2>
@@ -56,7 +82,7 @@ export default function Scores() {
                         year: "numeric",
                         month: "2-digit",
                         day: "2-digit",
-                      })}{" "}
+                      })}{(" ")}
                       {new Date(score.date).toLocaleTimeString([], {
                         hour: "2-digit",
                         minute: "2-digit",
