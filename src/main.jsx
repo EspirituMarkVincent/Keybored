@@ -36,7 +36,8 @@ function App() {
     handleKeyDown,
   } = useGame();
 
-  const { settings, isDarkMode, themeMode, cycleTheme, toggleSetting } = useSettings();
+  const { settings, isDarkMode, themeMode, cycleTheme, toggleSetting } =
+    useSettings();
 
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isScoresOpen, setIsScoresOpen] = useState(false);
@@ -87,13 +88,15 @@ function App() {
 
         <button
           className="keyboard-toggle-btn header-btn text-bg-tertiary"
-          onClick={() => toggleSetting('keyboard', 'visible')}
+          onClick={() => toggleSetting("keyboard", "visible")}
         >
           <KeyboardIcon className="w-8 h-8" />
         </button>
 
         <button
-          className="settings-btn header-btn text-bg-tertiary"
+          className={`settings-btn header-btn transition-colors ${
+                    isScoresOpen ? "text-color-correct" : "text-bg-tertiary"
+          }`}
           onClick={() => setIsScoresOpen((prev) => !prev)}
         >
           <ScoreIcon className="w-8 h-8" />
@@ -107,132 +110,141 @@ function App() {
         </button>
       </div>
 
-      <div className="main-container">
-        <div className="menu-top">
-          <div className="gameModeSelection">
-            <button
-              className={`game-mode-btn ${
-                gameModeSettings.mode === "time" ? "active" : ""
-              }`}
-              onClick={() =>
-                setGameModeSettings((prev) => ({ ...prev, mode: "time" }))
-              }
-            >
-              Time
-            </button>
-            {gameModeSettings.mode === "time" &&
-              [15, 30, 60].map((timeAmountSelected) => (
-                <button
-                  key={timeAmountSelected}
-                  className="game-mode-btn timeBtn"
-                  onClick={() =>
-                    setGameModeSettings((prev) => ({
-                      ...prev,
-                      timeGoal: timeAmountSelected,
-                    }))
-                  }
-                >
-                  {timeAmountSelected}
-                </button>
-              ))}
-            <button
-              className={`game-mode-btn ${
-                gameModeSettings.mode === "words" ? "active" : ""
-              }`}
-              onClick={() =>
-                setGameModeSettings((prev) => ({ ...prev, mode: "words" }))
-              }
-            >
-              Words
-            </button>
-            {gameModeSettings.mode === "words" &&
-              [10, 20, 30].map((wordsAmountSelected) => (
-                <button
-                  key={wordsAmountSelected}
-                  className="game-mode-btn wordsBtn"
-                  onClick={() =>
-                    setGameModeSettings((prev) => ({
-                      ...prev,
-                      wordGoal: wordsAmountSelected,
-                    }))
-                  }
-                >
-                  {wordsAmountSelected}
-                </button>
-              ))}
-            <button className="game-mode-btn newTextBtn" onClick={restartText}>
-              New Text
-            </button>
+      {isScoresOpen ? (
+        <Scores onClose={() => setIsScoresOpen(false)} />
+      ) : (
+        <div className="main-container">
+          <div className="menu-top">
+            <div className="gameModeSelection">
+              <button
+                className={`game-mode-btn ${
+                  gameModeSettings.mode === "time" ? "active" : ""
+                }`}
+                onClick={() =>
+                  setGameModeSettings((prev) => ({ ...prev, mode: "time" }))
+                }
+              >
+                Time
+              </button>
+              {gameModeSettings.mode === "time" &&
+                [15, 30, 60].map((timeAmountSelected) => (
+                  <button
+                    key={timeAmountSelected}
+                    className="game-mode-btn timeBtn"
+                    onClick={() =>
+                      setGameModeSettings((prev) => ({
+                        ...prev,
+                        timeGoal: timeAmountSelected,
+                      }))
+                    }
+                  >
+                    {timeAmountSelected}
+                  </button>
+                ))}
+              <button
+                className={`game-mode-btn ${
+                  gameModeSettings.mode === "words" ? "active" : ""
+                }`}
+                onClick={() =>
+                  setGameModeSettings((prev) => ({ ...prev, mode: "words" }))
+                }
+              >
+                Words
+              </button>
+              {gameModeSettings.mode === "words" &&
+                [10, 20, 30].map((wordsAmountSelected) => (
+                  <button
+                    key={wordsAmountSelected}
+                    className="game-mode-btn wordsBtn"
+                    onClick={() =>
+                      setGameModeSettings((prev) => ({
+                        ...prev,
+                        wordGoal: wordsAmountSelected,
+                      }))
+                    }
+                  >
+                    {wordsAmountSelected}
+                  </button>
+                ))}
+              <button
+                className="game-mode-btn newTextBtn"
+                onClick={restartText}
+              >
+                New Text
+              </button>
+            </div>
           </div>
-        </div>
 
-        <div className="relative z-[3] px-[10px]">
-          <TextField showTextContainer={settings.text.container} />
-        </div>
+          <div className="relative z-3 px-[10px]">
+            <TextField showTextContainer={settings.text.container} />
+          </div>
 
-        <div className="relative z-[3]">
-          {isFinished || (!isUserTyping && isScoresOpen) ? (
-            <Scores />
-          ) : (
-            <Keyboard
-              isUserTyping={isUserTyping}
-              isKeyboardActive={settings.keyboard.visible}
-              showKeyboardContainer={settings.keyboard.container}
+          <div className="relative z-3">
+            {isFinished ? (
+              <Scores onClose={resetEverything} />
+            ) : (
+              <Keyboard
+                isUserTyping={isUserTyping}
+                isKeyboardActive={settings.keyboard.visible}
+                showKeyboardContainer={settings.keyboard.container}
+              />
+            )}
+          </div>
+
+          <div className="form-group">
+            <input
+              className={`input-field ${
+                settings.input.visible ? "" : "hidden"
+              }`}
+              type="text"
+              value={input}
+              ref={inputRef}
+              onChange={handleInputChange}
+              disabled={isFinished}
+              onFocus={() => setIsUserTyping(true)}
+              onBlur={() => setIsUserTyping(false)}
+              onKeyDown={(e) => {
+                if (
+                  [
+                    "ArrowLeft",
+                    "ArrowRight",
+                    "ArrowUp",
+                    "ArrowDown",
+                    "Home",
+                    "End",
+                  ].includes(e.key)
+                ) {
+                  e.preventDefault();
+                  return;
+                }
+                handleKeyDown(e);
+              }}
+              onMouseDown={(e) => {
+                if (isUserTyping) e.preventDefault();
+                e.target.setSelectionRange(
+                  e.target.value.length,
+                  e.target.value.length
+                );
+              }}
+              onSelect={(e) => {
+                e.target.setSelectionRange(
+                  e.target.value.length,
+                  e.target.value.length
+                );
+              }}
             />
-          )}
-        </div>
-
-        <div className="form-group">
-          <input
-            className={`input-field ${settings.input.visible ? "" : "hidden"}`}
-            type="text"
-            value={input}
-            ref={inputRef}
-            onChange={handleInputChange}
-            disabled={isFinished}
-            onFocus={() => setIsUserTyping(true)}
-            onBlur={() => setIsUserTyping(false)}
-            onKeyDown={(e) => {
-              if (
-                [
-                  "ArrowLeft",
-                  "ArrowRight",
-                  "ArrowUp",
-                  "ArrowDown",
-                  "Home",
-                  "End",
-                ].includes(e.key)
-              ) {
-                e.preventDefault();
-                return;
-              }
-              handleKeyDown(e);
-            }}
-            onMouseDown={(e) => {
-              if (isUserTyping) e.preventDefault();
-              e.target.setSelectionRange(
-                e.target.value.length,
-                e.target.value.length
-              );
-            }}
-            onSelect={(e) => {
-              e.target.setSelectionRange(
-                e.target.value.length,
-                e.target.value.length
-              );
-            }}
-          />
-          <div className="stat-box wpm">{score.standardWPM} WPM</div>
-          <div className="stat-box time">
-            {gameModeSettings.mode === "time"
-              ? `${timer}s`
-              : `${wordIndex}/${gameModeSettings.wordGoal}`}
-          </div>
-          <div className="stat-box reset-button" onClick={resetEverything}>
-            Reset
+            <div className="stat-box wpm">{score.standardWPM} WPM</div>
+            <div className="stat-box time">
+              {gameModeSettings.mode === "time"
+                ? `${timer}s`
+                : `${wordIndex}/${gameModeSettings.wordGoal}`}
+            </div>
+            <div className="stat-box reset-button" onClick={resetEverything}>
+              Reset
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
