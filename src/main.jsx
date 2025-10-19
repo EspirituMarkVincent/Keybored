@@ -95,7 +95,7 @@ function App() {
 
         <button
           className={`settings-btn header-btn transition-colors ${
-                    isScoresOpen ? "text-color-correct" : "text-bg-tertiary"
+            isScoresOpen ? "text-color-correct" : "text-bg-tertiary"
           }`}
           onClick={() => setIsScoresOpen((prev) => !prev)}
         >
@@ -179,7 +179,7 @@ function App() {
             <TextField showTextContainer={settings.text.container} />
           </div>
 
-          <div className="relative z-3">
+          {/* <div className="relative z-3">
             {isFinished ? (
               <Scores onClose={resetEverything} />
             ) : (
@@ -189,6 +189,14 @@ function App() {
                 showKeyboardContainer={settings.keyboard.container}
               />
             )}
+          </div> */}
+
+          <div className="relative z-3">
+            <Keyboard
+              isUserTyping={isUserTyping}
+              isKeyboardActive={settings.keyboard.visible}
+              showKeyboardContainer={settings.keyboard.container}
+            />
           </div>
 
           <div className="form-group">
