@@ -69,7 +69,7 @@ function App() {
         onClose={() => setIsSettingsOpen(false)}
       />
 
-      <div className="header-container">
+      <div className="header-container items-center flex p-3">
         <div className="header-txt">Keybored</div>
         <div className="divider"></div>
 
@@ -113,7 +113,7 @@ function App() {
       {isScoresOpen ? (
         <Scores onClose={() => setIsScoresOpen(false)} />
       ) : (
-        <div className="main-container">
+        <div className="main-container flex">
           <div className="menu-top">
             <div className="gameModeSelection">
               <button
@@ -241,13 +241,13 @@ function App() {
                 );
               }}
             />
-            <div className="stat-box wpm">{score.standardWPM} WPM</div>
+            <div className="stat-box text-bg-tertiary wpm">{score.standardWPM} WPM</div>
             <div className="stat-box time">
               {gameModeSettings.mode === "time"
                 ? `${timer}s`
                 : `${wordIndex}/${gameModeSettings.wordGoal}`}
             </div>
-            <div className="stat-box reset-button" onClick={resetEverything}>
+            <div className="stat-box text-bg-tertiary reset-button" onClick={resetEverything}>
               Reset
             </div>
           </div>

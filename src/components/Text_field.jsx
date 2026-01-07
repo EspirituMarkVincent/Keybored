@@ -17,7 +17,7 @@ const Word = memo(function Word({
 
   return (
     <span
-      className={`word line-${lineNum}`}
+      className={`word text-2xl lg:text-3xl line-${lineNum}`}
       ref={(el) => registerWordEl(wordIndex, el)}
     >
       {Array.from({ length: renderLen }).map((_, i) => {
